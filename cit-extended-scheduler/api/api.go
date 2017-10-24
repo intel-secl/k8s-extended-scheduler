@@ -14,6 +14,11 @@ func FilterHandler(c *gin.Context) {
 	glog.V(4).Infof("Post received at extended scheduler: %v", args)
 	fmt.Println("Post received at extended scheduler: %v", args)
 	//Create a binding for args passed to the POST api
-	c.BindJSON(&args)
-	c.JSON(200, algorithm.FilteredHost(&args))
+	if c.BindJSON(&args) == nil {
+		result, err := algorithm.FilteredHost(&args)
+        	if err == nil {
+            		c.JSON(200, result)
+        	}
+	//c.JSON(200, algorithm.FilteredHost(&args))
+	}
 }

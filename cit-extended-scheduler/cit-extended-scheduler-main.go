@@ -23,6 +23,7 @@ func main() {
 
 	// fetch all the cmd line args
 	url, port, server_crt, server_key := util.GetCmdlineArgs()
+	fmt.Println(server_crt, server_key)
 
 	//initialize http server config
 	srv := &http.Server{
@@ -36,7 +37,8 @@ func main() {
 	//run the server instance
 	go func() {
                 // service connections
-                if err := srv.ListenAndServeTLS(*server_crt, *server_key); err != nil {
+                //if err := srv.ListenAndServeTLS(*server_crt, *server_key); err != nil {
+                if err := srv.ListenAndServe(); err != nil {
                         glog.V(4).Infof("listen: %s\n", err)
 			fmt.Printf("listen %s ...", err)
                 }

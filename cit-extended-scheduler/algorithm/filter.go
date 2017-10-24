@@ -8,7 +8,7 @@ import (
 )
 
 //FilteredHost is used for getting the nodes and pod details and verify and return if pod key matches with annotations
-func FilteredHost(args *schedulerapi.ExtenderArgs) *schedulerapi.ExtenderFilterResult {
+func FilteredHost(args *schedulerapi.ExtenderArgs) ( *schedulerapi.ExtenderFilterResult, error) {
 	result := []v1.Node{}
 	failedNodesMap := schedulerapi.FailedNodesMap{}
 
@@ -57,6 +57,6 @@ func FilteredHost(args *schedulerapi.ExtenderArgs) *schedulerapi.ExtenderFilterR
 		Nodes:       &v1.NodeList{Items: result},
 		NodeNames:   nil,
 		FailedNodes: failedNodesMap,
-	}
+	}, nil
 }
 

@@ -2,6 +2,7 @@ package algorithm
 
 import (
 	"fmt"
+	"regexp"
 	"k8s.io/api/core/v1"
 	"strconv"
 	"strings"
@@ -10,21 +11,9 @@ import (
 )
 
 const (
-	trustexpiry string = "TrustTagExpiry"
-	geolocationexpiry string = "AssetTagExpiry"
 	ahreport string = "AssetTagSignedReport"
 )
 
-//Compare for comparing two strings
-func Compare(a, b string) int {
-	if a == b {
-		return 0
-	}
-	if a < b {
-		return -1
-	}
-	return +1
-}
 
 //ValidatePodWithAnnotation is to validate signed trusted and location report with pod keys and values
 func ValidatePodWithAnnotation(podData []v1.NodeSelectorRequirement, claims jwt.MapClaims) (int, int, int, int) {
@@ -75,29 +64,28 @@ func ValidatePodWithAnnotation(podData []v1.NodeSelectorRequirement, claims jwt.
 }
 
 //ValidateNodeByTime is used for validate time for each node with current system time(Expiry validation)
-func ValidateNodeByTime(claims jwt.MapClaims) (int, int) {
-	trustedValidToTime, assetValidToTime := "", ""
-	trustedTimeFlag, assetTimeFlag := 0, 0
-	if timeVal, ok := claims[trustexpiry].(string); ok {
-		trustedValidToTime = strings.Replace(timeVal, ".", ":", -1)
-	}
+func ValidateNodeByTime(claims jwt.MapClaims) int {
+	trustedTimeFlag := 0
+	if timeVal, ok := claims["valid_to"].(string); ok {
+		//trustedValidToTime = strings.Replace(timeVal, ".", ":", -1)
+		reg, err := regexp.Compile("[0-9]+-[0-9]+-[0-9]+T[0-9]+:[0-9]+:[0-9]+")
+    		if err != nil {
+        		fmt.Println(err)
+    		}
+		newstr := reg.ReplaceAllString(timeVal, "")
+		fmt.Println(newstr)
+		trustedValidToTime := strings.Replace(timeVal, newstr, "", -1)
+		fmt.Println("Trust validity time", timeVal )
+		fmt.Println("Trust validity time after replace ", trustedValidToTime )
 
-	if timeVal, ok := claims[geolocationexpiry].(string); ok {
-		assetValidToTime = strings.Replace(timeVal, ".", ":", -1)
-	}
-
-	t := time.Now()
-	if trustedTimeFlag == 0 {
-		timeDiff := Compare(trustedValidToTime, t.Format(time.RFC3339))
+		t := time.Now()
+		timeDiff := strings.Compare(trustedValidToTime, t.Format(time.RFC3339))
+		fmt.Println("Time Now:", t.Format(time.RFC3339))
+		fmt.Println("Time diff:", timeDiff)
 		if timeDiff >= 0 {
 			trustedTimeFlag = 1
 		}
 	}
-	if assetTimeFlag == 0 {
-		timeDiff := Compare(assetValidToTime, t.Format(time.RFC3339))
-		if timeDiff >= 0 {
-			assetTimeFlag = 1
-		}
-	}
-	return trustedTimeFlag, assetTimeFlag
+
+	return trustedTimeFlag
 }
