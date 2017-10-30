@@ -3,16 +3,17 @@ package algorithm
 import (
 	"fmt"
 	//"strings"
-	"cit-extended-scheduler/util"
+	"k8s.io/api/core/v1"
 	"crypto/rsa"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/golang/glog"
 	"golang.org/x/oauth2/jws"
-	"k8s.io/api/core/v1"
+	"cit-extended-scheduler/util"
 	//"crypto/sha256"
 	//"encoding/base64"
 	//"io/ioutil"
 )
+
 
 //fatal functions just logs and exits
 func fatal(err error) {
@@ -39,14 +40,14 @@ func ValidateAnnotationByPublicKey(cipherText string, key *rsa.PublicKey) error 
 
 //JWTParseWithClaims is used for parsing and adding the annotation values in claims map
 func JWTParseWithClaims(cipherText string, verifyKey *rsa.PublicKey, claim jwt.MapClaims) {
-	token, err := jwt.ParseWithClaims(cipherText, claim, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(cipherText, claim, func(token *jwt.Token) ( interface{}, error) {
 		return verifyKey, nil
 	})
-	fmt.Println("ganesh token is ", token)
+	glog.V(4).Infof("Parsed token is :", token)
 	if err != nil {
 		fmt.Println("error in JWTParseWithClaims")
+		fatal(err)
 	}
-	fatal(err)
 }
 
 //CheckAnnotationAttrib is used for validate node with restpect to time,trusted and location tags
@@ -60,8 +61,8 @@ func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement)
 		return false
 	}
 	validationStatus := ValidateAnnotationByPublicKey(cipherText, verifyKey)
-	fmt.Println("validation status", validationStatus)
-	fmt.Println("claims before", claims)
+	//fmt.Println("validation status", validationStatus)
+	//fmt.Println("claims before", claims)
 	if validationStatus == nil {
 		glog.V(4).Infof("Signature is valid, STR is from valid AH")
 	} else {
@@ -72,8 +73,8 @@ func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement)
 
 	//cipherText is the annotation applied to the node, claims is the parsed AH report assigned as the annotation
 	JWTParseWithClaims(cipherText, verifyKey, claims)
-	fmt.Println("claims after", claims)
-
+	//fmt.Println("claims after", claims)
+	
 	verify := ValidatePodWithAnnotation(node, claims)
 	if verify {
 		glog.V(4).Infof("Node label validated against node annotations succesfull")

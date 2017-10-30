@@ -8,7 +8,7 @@ import (
 )
 
 //FilteredHost is used for getting the nodes and pod details and verify and return if pod key matches with annotations
-func FilteredHost(args *schedulerapi.ExtenderArgs) (*schedulerapi.ExtenderFilterResult, error) {
+func FilteredHost(args *schedulerapi.ExtenderArgs) ( *schedulerapi.ExtenderFilterResult, error) {
 	result := []v1.Node{}
 	failedNodesMap := schedulerapi.FailedNodesMap{}
 
@@ -22,14 +22,14 @@ func FilteredHost(args *schedulerapi.ExtenderArgs) (*schedulerapi.ExtenderFilter
 
 			//get the nodeselector data
 			nodeSelectorData := pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
-			fmt.Println("Node Affinity tag found in pod specification")
-			fmt.Println(nodeSelectorData)
+			//fmt.Println("Node Affinity tag found in pod specification")
+			//fmt.Println(nodeSelectorData)
 
 			for _, node := range nodes.Items {
 				//allways check for the trust tag signed report
 				if cipherVal, ok := node.Annotations["TrustTagSignedReport"]; ok {
 					for _, nodeSelector := range nodeSelectorData {
-						//match the data from the pod node selector tag to the node annotation
+						//match the data from the pod node selector tag to the node annotation 
 						if CheckAnnotationAttrib(cipherVal, nodeSelector.MatchExpressions) {
 							result = append(result, node)
 						} else {
@@ -40,26 +40,27 @@ func FilteredHost(args *schedulerapi.ExtenderArgs) (*schedulerapi.ExtenderFilter
 			}
 		} else {
 			for _, node := range nodes.Items {
-				fmt.Println("No Node Selector terms tag found in pod specification")
+				//fmt.Println("No Node Selector terms tag found in pod specification")
 				result = append(result, node)
 			}
 		}
 	} else {
 		for _, node := range nodes.Items {
-			fmt.Println("No Node Affinity tag found in pod specification")
+			//fmt.Println("No Node Affinity tag found in pod specification")
 			result = append(result, node)
 		}
 	}
 
 	glog.V(4).Infof("Returning following nodelist from extended scheduler: %v", result)
-	fmt.Println("Returning following nodelist from extended scheduler: %v", result)
+	//fmt.Println("Returning following nodelist from extended scheduler: %v", result)
 	if len(result) != 0 {
 		return &schedulerapi.ExtenderFilterResult{
-			Nodes:       &v1.NodeList{Items: result},
-			NodeNames:   nil,
-			FailedNodes: failedNodesMap,
+		Nodes:       &v1.NodeList{Items: result},
+		NodeNames:   nil,
+		FailedNodes: failedNodesMap,
 		}, nil
 	} else {
 		return nil, fmt.Errorf("Node validation failed at extended scheduler")
 	}
 }
+

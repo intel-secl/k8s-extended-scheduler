@@ -2,20 +2,21 @@ package algorithm
 
 import (
 	"fmt"
-	jwt "github.com/dgrijalva/jwt-go"
-	"k8s.io/api/core/v1"
 	"regexp"
+	"k8s.io/api/core/v1"
 	"strconv"
 	"strings"
 	"time"
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 const (
 	ahreport string = "AssetTagSignedReport"
 )
 
+
 //ValidatePodWithAnnotation is to validate signed trusted and location report with pod keys and values
-func ValidatePodWithAnnotation(podData []v1.NodeSelectorRequirement, claims jwt.MapClaims) bool {
+func ValidatePodWithAnnotation(podData []v1.NodeSelectorRequirement, claims jwt.MapClaims) (bool) {
 	//trustFlag, trustedVerifyFlag, locationFlag, locationVerifyFlag, annotateLocationFlag := 0, 0, 0, 0, 0
 	annotateLocationFlag := 0
 
@@ -24,24 +25,22 @@ func ValidatePodWithAnnotation(podData []v1.NodeSelectorRequirement, claims jwt.
 		if nodeVal, ok := claims[val.Key]; ok {
 			for _, podVal := range val.Values {
 				if nodeVal == true || nodeVal == false {
-					fmt.Println("nodeVal is not boolean")
+					//fmt.Println("nodeVal is not boolean")
 					nodeValTemp := nodeVal.(bool)
 					nodeVal := strconv.FormatBool(nodeValTemp)
 					if podVal == nodeVal {
-						fmt.Println("Ganesh 1 :", val)
 						return true
 					}
 				} else {
-					fmt.Println("nodeVal is boolean")
+					//fmt.Println("nodeVal is boolean")
 					if podVal == nodeVal {
-						fmt.Println("Ganesh 1 :", val)
 						return true
 					}
 				}
 			}
 		} else {
 			if strings.Contains(val.Key, ".") {
-				fmt.Println("Attestation hub val ", val)
+				//fmt.Println("Attestation hub val ", val)
 				podValArray := strings.Split(val.Key, ".")
 				if claims[ahreport].(map[string]interface{})[podValArray[0]] != nil {
 					assetTagMap := claims[ahreport].(map[string]interface{})[podValArray[0]]
@@ -58,7 +57,7 @@ func ValidatePodWithAnnotation(podData []v1.NodeSelectorRequirement, claims jwt.
 					if annotateLocationFlag == 0 {
 						return false
 					} else {
-						return true
+						return true 
 					}
 				}
 			}
@@ -73,19 +72,19 @@ func ValidateNodeByTime(claims jwt.MapClaims) int {
 	if timeVal, ok := claims["valid_to"].(string); ok {
 		//trustedValidToTime = strings.Replace(timeVal, ".", ":", -1)
 		reg, err := regexp.Compile("[0-9]+-[0-9]+-[0-9]+T[0-9]+:[0-9]+:[0-9]+")
-		if err != nil {
-			fmt.Println(err)
-		}
+    		if err != nil {
+        		fmt.Println(err)
+    		}
 		newstr := reg.ReplaceAllString(timeVal, "")
-		fmt.Println(newstr)
+		//fmt.Println(newstr)
 		trustedValidToTime := strings.Replace(timeVal, newstr, "", -1)
-		fmt.Println("Trust validity time", timeVal)
-		fmt.Println("Trust validity time after replace ", trustedValidToTime)
+		//fmt.Println("Trust validity time", timeVal )
+		//fmt.Println("Trust validity time after replace ", trustedValidToTime )
 
 		t := time.Now()
 		timeDiff := strings.Compare(trustedValidToTime, t.Format(time.RFC3339))
-		fmt.Println("Time Now:", t.Format(time.RFC3339))
-		fmt.Println("Time diff:", timeDiff)
+		//fmt.Println("Time Now:", t.Format(time.RFC3339))
+		//fmt.Println("Time diff:", timeDiff)
 		if timeDiff >= 0 {
 			trustedTimeFlag = 1
 		}

@@ -16,8 +16,9 @@ Binary name - citk8sscheduler-1.0-SNAPSHOT
 Installation of binary
 ##############################################################################
 Pre-requisites
-1. Kubernetes cluster should be up and running
-2. CIT custom controller should be installed and running
-3. Edit config file in src folder
-4. Copy the binary from bin folder and config file from src folder to root folder 
-Install this binary on kubernetes master
+1. Install the AH public Key and Server cert and server public key
+2. Re-Start the base scheduler with the policy.json configuration
+3. CIT extended scheduler should be installed 
+4. Copy the binary from bin folder and config file from src folder to /opt folder 
+5. Run the exetended scheduler as below
+	service cit-extended-scheduler start
