@@ -2,21 +2,20 @@ package algorithm
 
 import (
 	"fmt"
-	"regexp"
+	jwt "github.com/dgrijalva/jwt-go"
 	"k8s.io/api/core/v1"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
-	jwt "github.com/dgrijalva/jwt-go"
 )
 
 const (
 	ahreport string = "AssetTagSignedReport"
 )
 
-
 //ValidatePodWithAnnotation is to validate signed trusted and location report with pod keys and values
-func ValidatePodWithAnnotation(podData []v1.NodeSelectorRequirement, claims jwt.MapClaims) (bool) {
+func ValidatePodWithAnnotation(podData []v1.NodeSelectorRequirement, claims jwt.MapClaims) bool {
 	//trustFlag, trustedVerifyFlag, locationFlag, locationVerifyFlag, annotateLocationFlag := 0, 0, 0, 0, 0
 	annotateLocationFlag := 0
 
@@ -57,7 +56,7 @@ func ValidatePodWithAnnotation(podData []v1.NodeSelectorRequirement, claims jwt.
 					if annotateLocationFlag == 0 {
 						return false
 					} else {
-						return true 
+						return true
 					}
 				}
 			}
@@ -72,9 +71,9 @@ func ValidateNodeByTime(claims jwt.MapClaims) int {
 	if timeVal, ok := claims["valid_to"].(string); ok {
 		//trustedValidToTime = strings.Replace(timeVal, ".", ":", -1)
 		reg, err := regexp.Compile("[0-9]+-[0-9]+-[0-9]+T[0-9]+:[0-9]+:[0-9]+")
-    		if err != nil {
-        		fmt.Println(err)
-    		}
+		if err != nil {
+			fmt.Println(err)
+		}
 		newstr := reg.ReplaceAllString(timeVal, "")
 		//fmt.Println(newstr)
 		trustedValidToTime := strings.Replace(timeVal, newstr, "", -1)

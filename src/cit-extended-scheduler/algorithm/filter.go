@@ -8,7 +8,7 @@ import (
 )
 
 //FilteredHost is used for getting the nodes and pod details and verify and return if pod key matches with annotations
-func FilteredHost(args *schedulerapi.ExtenderArgs) ( *schedulerapi.ExtenderFilterResult, error) {
+func FilteredHost(args *schedulerapi.ExtenderArgs) (*schedulerapi.ExtenderFilterResult, error) {
 	result := []v1.Node{}
 	failedNodesMap := schedulerapi.FailedNodesMap{}
 
@@ -29,7 +29,7 @@ func FilteredHost(args *schedulerapi.ExtenderArgs) ( *schedulerapi.ExtenderFilte
 				//allways check for the trust tag signed report
 				if cipherVal, ok := node.Annotations["TrustTagSignedReport"]; ok {
 					for _, nodeSelector := range nodeSelectorData {
-						//match the data from the pod node selector tag to the node annotation 
+						//match the data from the pod node selector tag to the node annotation
 						if CheckAnnotationAttrib(cipherVal, nodeSelector.MatchExpressions) {
 							result = append(result, node)
 						} else {
@@ -55,12 +55,11 @@ func FilteredHost(args *schedulerapi.ExtenderArgs) ( *schedulerapi.ExtenderFilte
 	//fmt.Println("Returning following nodelist from extended scheduler: %v", result)
 	if len(result) != 0 {
 		return &schedulerapi.ExtenderFilterResult{
-		Nodes:       &v1.NodeList{Items: result},
-		NodeNames:   nil,
-		FailedNodes: failedNodesMap,
+			Nodes:       &v1.NodeList{Items: result},
+			NodeNames:   nil,
+			FailedNodes: failedNodesMap,
 		}, nil
 	} else {
 		return nil, fmt.Errorf("Node validation failed at extended scheduler")
 	}
 }
-

@@ -16,9 +16,9 @@ func FilterHandler(c *gin.Context) {
 	//Create a binding for args passed to the POST api
 	if c.BindJSON(&args) == nil {
 		result, err := algorithm.FilteredHost(&args)
-        	if err == nil {
-          		c.JSON(200, result)
-        	} else {
+		if err == nil {
+			c.JSON(200, result)
+		} else {
 			c.JSON(500, err)
 		}
 	}
