@@ -1,0 +1,14 @@
+[Unit]
+Description=Cit k8s extended scheduler
+ConditionPathExists=/opt/cit_k8s_extensions/bin/citk8sscheduler-1.0-SNAPSHOT
+
+[Service]
+ExecStart=/opt/cit_k8s_extensions/bin/citk8sscheduler-1.0-SNAPSHOT -schedConf="extended_scheduler_config.json"
+KillMode=process
+Restart=on-failure
+RestartPreventExitStatus=255
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
+Alias=citk8scontroller.service

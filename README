@@ -1,0 +1,100 @@
+##############################################################################
+Pre-requisites for building the scheduler from source
+##############################################################################
+Note: You can skip installation of pre-requisites if already installed.
+
+1. Follow steps given in pre-requisites_README on kubernetes master node.
+
+2. Run below command from terminal inside the source directory
+
+   mvn package
+
+3. On build success, you can find the executable binary in the "bin" folder
+
+##############################################################################
+Installation of binary on kubernetes master machine
+##############################################################################
+Pre-requisites
+
+1. Generate Server cert for extended scheduler.
+
+	chmod +x create_k8s_extsched_cert.sh
+	./create_k8s_extsched_cert.sh
+	Note: ./create_k8s_extsched_cert.sh -h can be used to display script arguments. 
+	Refer clientcerts_README for more details.
+
+2. Create directories cit_k8s_extensions/bin inside /opt .
+
+	mkdir /opt/cit_k8s_extensions
+	mkdir /opt/cit_k8s_extensions/bin
+	
+3. CIT Attestation Reporting Hub should be up and running.
+
+STEPS:
+1. In order to bring up the Kubernetes cluster along with the extended scheduler, we need to:
+
+	(a) Create scheduler_policy.json file as per the template below. This contains the configration required by base scheduler to reach the extended scheduler. This file should be placed with the extended scheduler binary (inside /opt/cit_k8s_extensions/bin). Rewrite URL as per IP address and port.
+	
+	{
+    	"predicates": [],
+    	"priorities": [],
+    	"extenders": [{
+        	"urlPrefix": "https://127.0.0.1:8888",
+        	"apiVersion": "v1",
+        	"filterVerb": "filter",
+        	"enableHttps": true
+    		}]
+	}
+	
+	(b) Provide extended scheduler config in file kubeadm_policy.yaml:
+
+	apiVersion: kubeadm.k8s.io/v1alpha1
+	kind: MasterConfiguration
+	certificatesDir: /etc/kubernetes/pki/
+	tokenTTL: 0
+	schedulerExtraArgs:
+  		policy-config-file : "<<path_to>>/scheduler_policy.json"
+		
+	Place it in the kubernetes working path /etc/kubernetes/
+
+	(c) Run below command,
+			kubeadm init --config <<path_to>>/kubeadm_policy.yaml
+			
+2.  Transfer the public key from the CIT AH and place it in /etc/kubernetes/pki/ folder 
+	(a) login to the machine where CIT Attestation Reporting Hub is installed 
+	(b) scp the attestation hub's public key (or use other ways to transfer the key to k8s)
+		scp /opt/attestation-hub/configuration/hub_public_key.pem <<user>>@<<k8smasternode>>:/etc/kubernetes/pki/.
+
+3. Copy the binary and config file to /opt/cit_k8s_extensions/bin folder
+
+	cp citk8sscheduler-1.0-SNAPSHOT /opt/cit_k8s_extensions/bin/
+	chmod +x /opt/cit_k8s_extensions/bin/citk8sscheduler-1.0-SNAPSHOT
+
+4. Copy extended scheduler configuration file cit-extended-scheduler-config.json to /opt/cit_k8s_extensions/bin directory
+
+	cp cit-extended-scheduler-config.json /opt/cit_k8s_extensions/bin/
+
+5. Edit cit-extended-scheduler-config.json file with appropriate paths to certificates(generated in pre-requisites 1) and keys(from step 2)
+
+6. Place below systemd service file in /etc/systemd/system/ folder (available in the same directory as this README)
+		citk8sscheduler.service
+
+7. Run below commands to enable service daemon
+	systemctl daemon-reload    #(to activate newly added service)
+	systemctl enable citk8sscheduler.service
+
+8. Run the extended scheduler using below command	
+
+	systemctl start citk8sscheduler.service
+
+9. To check status of this service run below command
+	
+	systemctl status citk8sscheduler.service
+
+10. To stop this service run below command
+	
+	systemctl stop citk8sscheduler.service
+
+11. To check the port where extended scheduler is listening,
+
+	netstat -tlpn | grep 8888
