@@ -25,7 +25,7 @@ func GetCmdlineArgs() (string, string, string, string) {
 	conf := extenedSchedConfig{}
 	//schedConf := flag.String("schedConf", "", "Configration file for Extended Scheduler")
 	//flag.Parse()
-	schedConf := "./cit-extended-scheduler-config.json"
+	schedConf := "/opt/cit_k8s_extensions/bin/cit-extended-scheduler-config.json"
 	//err := gonfig.GetConf("./extended_scheduler_config.json", &conf)
 	/*
 		if *schedConf == "" {
