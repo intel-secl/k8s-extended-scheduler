@@ -17,18 +17,20 @@ Installation of binary on kubernetes master machine
 Pre-requisites
 
 1. Generate Server cert for extended scheduler.
-
+	cd <path_to_create_k8s_extsched_cert.sh> #Note: Certificates generation scripts are available in cit_k8s_extensions directory
 	chmod +x create_k8s_extsched_cert.sh
-	./create_k8s_extsched_cert.sh
+	
 	Note: ./create_k8s_extsched_cert.sh -h can be used to display script arguments. 
 	Refer clientcerts_README for more details.
+	
+	./create_k8s_extsched_cert.sh <arguments> 
+	#Example: ./create_k8s_extsched_cert.sh -c /etc/kubernetes/pki/ca.crt -k /etc/kubernetes/pki/ca.key -s "kubernetesmaster2.iind.intel.com,kubernetesmaster2"
+
 
 2. Create directories cit_k8s_extensions/bin inside /opt .
 
-	mkdir /opt/cit_k8s_extensions
-	mkdir /opt/cit_k8s_extensions/bin
+	mkdir -p /opt/cit_k8s_extensions/bin
 	
-3. CIT Attestation Reporting Hub should be up and running.
 
 STEPS:
 1. In order to bring up the Kubernetes cluster along with the extended scheduler, we need to:
@@ -50,10 +52,10 @@ STEPS:
 
 	apiVersion: kubeadm.k8s.io/v1alpha1
 	kind: MasterConfiguration
-	certificatesDir: /etc/kubernetes/pki/
+	certificatesDir: "/etc/kubernetes/pki/"
 	tokenTTL: 0
 	schedulerExtraArgs:
-  		policy-config-file : "<<path_to>>/scheduler_policy.json"
+  	  policy-config-file : "<<path_to>>/scheduler_policy.json"
 		
 	Place it in the kubernetes working path /etc/kubernetes/
 
@@ -62,7 +64,7 @@ STEPS:
 			
 2.  Transfer the public key from the CIT AH and place it in /etc/kubernetes/pki/ folder 
 	(a) login to the machine where CIT Attestation Reporting Hub is installed 
-	(b) scp the attestation hub's public key (or use other ways to transfer the key to k8s)
+	(b) scp the AH's public key (or use other ways to transfer the key to k8s)
 		scp /opt/attestation-hub/configuration/hub_public_key.pem <<user>>@<<k8smasternode>>:/etc/kubernetes/pki/.
 
 3. Copy the binary and config file to /opt/cit_k8s_extensions/bin folder
@@ -72,6 +74,7 @@ STEPS:
 
 4. Copy extended scheduler configuration file cit-extended-scheduler-config.json to /opt/cit_k8s_extensions/bin directory
 
+	cd ..
 	cp cit-extended-scheduler-config.json /opt/cit_k8s_extensions/bin/
 
 5. Edit cit-extended-scheduler-config.json file with appropriate paths to certificates(generated in pre-requisites 1) and keys(from step 2)
@@ -81,7 +84,7 @@ STEPS:
 
 7. Run below commands to enable service daemon
 	systemctl daemon-reload    #(to activate newly added service)
-	systemctl enable citk8sscheduler.service
+	
 
 8. Run the extended scheduler using below command	
 
