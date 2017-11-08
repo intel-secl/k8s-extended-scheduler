@@ -72,7 +72,7 @@ func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement)
 
 	//cipherText is the annotation applied to the node, claims is the parsed AH report assigned as the annotation
 	JWTParseWithClaims(cipherText, verifyKey, claims)
-	//fmt.Println("claims after", claims)
+	fmt.Println("claims after", claims)
 
 	verify := ValidatePodWithAnnotation(node, claims)
 	if verify {
