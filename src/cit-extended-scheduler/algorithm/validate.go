@@ -55,18 +55,23 @@ func ValidatePodWithAnnotation(nodeData []v1.NodeSelectorRequirement, claims jwt
 
 				if geoKey, ok := assetClaims[nodeValArray[0]]; ok {
 					fmt.Println("Found Key in AH report", geoKey)
-					//assetTagMap := claims[ahreport].(map[string]interface{})[podValArray[0]]
-					//assetTagList, ok := assetTagMap.([]interface{})
 					assetTagList, ok := geoKey.([]interface{})
 					if ok {
+						fmt.Println("nodeVal value is ", nodeValArray[1])
+						flag := false
 						for _, geoVal := range assetTagList {
+							fmt.Println("geoVal value is ", geoVal)
 							if nodeValArray[1] == geoVal {
 								fmt.Println("Asset tag value found in AH report")
-								continue
-							} else {
-								fmt.Println("Asset tag value not found in AH report")
-								return false
+								flag = true
 							}
+						}
+						if flag {
+							fmt.Println("Asset tag value found in AH report flag is true")
+							continue
+						} else {
+							fmt.Println("Asset tag not found flag is false")
+							return false
 						}
 					}
 				}
