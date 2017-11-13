@@ -64,7 +64,7 @@ STEPS:
     		]
 	}
 	
-	(b) Provide extended scheduler config in file kubeadm_policy.yaml:
+	(b) Create file kubeadm_policy.yaml and provide below extended scheduler config in it:
 
 	apiVersion: kubeadm.k8s.io/v1alpha1
 	kind: MasterConfiguration
