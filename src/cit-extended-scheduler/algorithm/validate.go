@@ -11,14 +11,11 @@ import (
 )
 
 const (
-	//ahreport string = "AssetTagSignedReport"
 	ahreport string = "asset_tags"
 )
 
 //ValidatePodWithAnnotation is to validate signed trusted and location report with pod keys and values
 func ValidatePodWithAnnotation(nodeData []v1.NodeSelectorRequirement, claims jwt.MapClaims) bool {
-	//trustFlag, trustedVerifyFlag, locationFlag, locationVerifyFlag, annotateLocationFlag := 0, 0, 0, 0, 0
-	//annotateLocationFlag := 0
 	assetClaims := claims[ahreport].(map[string]interface{})
 	fmt.Println("Asset tag report is ", assetClaims)
 
@@ -60,8 +57,10 @@ func ValidatePodWithAnnotation(nodeData []v1.NodeSelectorRequirement, claims jwt
 						fmt.Println("nodeVal value is ", nodeValArray[1])
 						flag := false
 						for _, geoVal := range assetTagList {
-							fmt.Println("geoVal value is ", geoVal)
-							if nodeValArray[1] == geoVal {
+							newVal := geoVal.(string)
+							newVal = strings.Replace(newVal, " ", "", -1)
+							fmt.Println("geoVal value is ", newVal)
+							if nodeValArray[1] == newVal {
 								fmt.Println("Asset tag value found in AH report")
 								flag = true
 							}
