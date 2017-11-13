@@ -38,14 +38,30 @@ STEPS:
 	(a) Create scheduler_policy.json file as per the template below. This contains the configration required by base scheduler to reach the extended scheduler. This file should be placed with the extended scheduler binary (inside /opt/cit_k8s_extensions/bin). Rewrite URL as per IP address and port.
 	
 	{
-    	"predicates": [],
-    	"priorities": [],
-    	"extenders": [{
-        	"urlPrefix": "https://127.0.0.1:8888",
-        	"apiVersion": "v1",
-        	"filterVerb": "filter",
-        	"enableHttps": true
-    		}]
+		"kind" : "Policy",
+		"apiVersion" : "v1",
+		"predicates" : [
+			{"name" : "PodFitsHostPorts"},
+			{"name" : "PodFitsResources"},
+			{"name" : "NoDiskConflict"},
+			{"name" : "MatchNodeSelector"},
+			{"name" : "HostName"}
+			],
+		"priorities" : [
+			{"name" : "LeastRequestedPriority", "weight" : 1},
+			{"name" : "BalancedResourceAllocation", "weight" : 1},
+			{"name" : "ServiceSpreadingPriority", "weight" : 1},
+			{"name" : "EqualPriority", "weight" : 1}
+			],
+		"extenders" : [
+			{
+        		"urlPrefix": "https://10.242.131.152:8888/",
+        		"apiVersion": "v1beta1",
+        		"filterVerb": "filter",
+			"weight": 5,
+        		"enableHttps": true
+			}
+    		]
 	}
 	
 	(b) Provide extended scheduler config in file kubeadm_policy.yaml:
@@ -53,9 +69,13 @@ STEPS:
 	apiVersion: kubeadm.k8s.io/v1alpha1
 	kind: MasterConfiguration
 	certificatesDir: "/etc/kubernetes/pki/"
-	tokenTTL: 0
+	#tokenTTL: 0
 	schedulerExtraArgs:
-  	  policy-config-file : "<<path_to>>/scheduler_policy.json"
+	  policy-config-file : "<path_to_scheduler_policy.json>scheduler_policy.json"
+	schedulerExtraVolumes: 
+	- name : "extendedsched"
+	  hostPath : "/opt/cit_k8s_extensions/bin/"
+	  mountPath : "/opt/cit_k8s_extensions/bin/"
 		
 	Place it in the kubernetes working path /etc/kubernetes/
 
