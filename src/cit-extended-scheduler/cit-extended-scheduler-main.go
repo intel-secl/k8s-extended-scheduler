@@ -13,34 +13,47 @@ import (
 	"time"
 )
 
-func main() {
-	fmt.Printf("Starting extended scheduler...")
-	glog.V(4).Infof("Starting extended scheduler...")
+func extendedScheduler(c *gin.Context) {
+	c.JSON(200, gin.H{"result": "Cit Extended Scheduler"})
+	return
+}
 
+func SetupRouter()(*gin.Engine, *http.Server) {
 	//get a webserver instance, that contains a muxer, middleware and configuration settings
 	router := gin.Default()
 
 	// fetch all the cmd line args
 	url, port, server_crt, server_key := util.GetCmdlineArgs()
-	//fmt.Println(server_crt, server_key)
+	fmt.Println(server_crt, server_key)
 
 	//initialize http server config
-	srv := &http.Server{
+	server := &http.Server{
 		Addr:    url + ":" + port,
 		Handler: router,
 	}
 
-	//hadler for the post operation
-	router.POST("filter", api.FilterHandler)
-
 	//run the server instance
 	go func() {
 		// service connections
-		if err := srv.ListenAndServeTLS(server_crt, server_key); err != nil {
+		if err := server.ListenAndServeTLS(server_crt, server_key); err != nil {
 			glog.V(4).Infof("listen: %s\n", err)
 			//fmt.Printf("listen %s ...", err)
 		}
 	}()
+
+	router.GET("/", extendedScheduler)
+	
+	return router, server
+}
+
+func main() {
+	fmt.Printf("Starting extended scheduler...")
+	glog.V(4).Infof("Starting extended scheduler...")
+
+	router, server := SetupRouter()
+
+	//hadler for the post operation
+	router.POST("filter", api.FilterHandler)
 
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds.
@@ -51,10 +64,10 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	if err := srv.Shutdown(ctx); err != nil {
+	if err := server.Shutdown(ctx); err != nil {
 
 		glog.V(4).Infof("Extended Scheduler Server Shutdown:", err)
 	}
 	glog.V(4).Infof("Extended Scheduler Server exist")
-	//fmt.Printf("Stoping extended scheduler...")
+	fmt.Printf("Stoping extended scheduler...")
 }
