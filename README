@@ -55,7 +55,7 @@ STEPS:
 			],
 		"extenders" : [
 			{
-        		"urlPrefix": "https://10.242.131.152:8888/",
+        		"urlPrefix": "https://<<k8s master ip address>>:8888/",
         		"apiVersion": "v1beta1",
         		"filterVerb": "filter",
 			"weight": 5,
@@ -89,7 +89,7 @@ STEPS:
 
 3. Copy the binary and config file to /opt/cit_k8s_extensions/bin folder
 
-	cp citk8sscheduler-1.0-SNAPSHOT /opt/cit_k8s_extensions/bin/
+		
 	chmod +x /opt/cit_k8s_extensions/bin/citk8sscheduler-1.0-SNAPSHOT
 
 4. Copy extended scheduler configuration file cit-extended-scheduler-config.json to /opt/cit_k8s_extensions/bin directory
