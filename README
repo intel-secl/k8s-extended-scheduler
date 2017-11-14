@@ -97,7 +97,7 @@ STEPS:
 	cd ..
 	cp cit-extended-scheduler-config.json /opt/cit_k8s_extensions/bin/
 
-5. Edit cit-extended-scheduler-config.json file with appropriate paths to certificates(generated in pre-requisites 1) and keys(from step 2)
+5. Edit cit-extended-scheduler-config.json file with appropriate URL ip address of k8smaster, port, paths to certificates(generated in pre-requisites 1) and keys(from step 2)
 
 6. Place below systemd service file in /etc/systemd/system/ folder (available in the same directory as this README)
 		citk8sscheduler.service
