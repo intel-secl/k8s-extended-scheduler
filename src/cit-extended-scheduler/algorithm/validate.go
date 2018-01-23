@@ -46,34 +46,34 @@ func ValidatePodWithAnnotation(nodeData []v1.NodeSelectorRequirement, claims jwt
 				}
 			}
 		} else {
-			if strings.Contains(val.Key, ".") {
-				fmt.Println("Attestation hub val ", val)
-				nodeValArray := strings.Split(val.Key, ".")
+			//if strings.Contains(val.Key, ".") {
+			fmt.Println("Attestation hub val ", val)
+			//nodeValArray := strings.Split(val.Key, ".")
 
-				if geoKey, ok := assetClaims[nodeValArray[0]]; ok {
-					fmt.Println("Found Key in AH report", geoKey)
-					assetTagList, ok := geoKey.([]interface{})
-					if ok {
-						fmt.Println("nodeVal value is ", nodeValArray[1])
-						flag := false
-						for _, geoVal := range assetTagList {
-							newVal := geoVal.(string)
-							newVal = strings.Replace(newVal, " ", "", -1)
-							fmt.Println("geoVal value is ", newVal)
-							if nodeValArray[1] == newVal {
-								fmt.Println("Asset tag value found in AH report")
-								flag = true
-							}
-						}
-						if flag {
-							fmt.Println("Asset tag value found in AH report flag is true")
-							continue
-						} else {
-							fmt.Println("Asset tag not found flag is false")
-							return false
+			if geoKey, ok := assetClaims[val.Key]; ok {
+				fmt.Println("Found Key in AH report", geoKey)
+				assetTagList, ok := geoKey.([]interface{})
+				if ok {
+					fmt.Println("nodeVal value is ", val.Values[0])
+					flag := false
+					for _, geoVal := range assetTagList {
+						newVal := geoVal.(string)
+						newVal = strings.Replace(newVal, " ", "", -1)
+						fmt.Println("geoVal value is ", newVal)
+						if val.Values[0] == newVal {
+							fmt.Println("Asset tag value found in AH report")
+							flag = true
 						}
 					}
+					if flag {
+						fmt.Println("Asset tag value found in AH report flag is true")
+						continue
+					} else {
+						fmt.Println("Asset tag not found flag is false")
+						return false
+					}
 				}
+				//}
 			}
 		}
 	}
