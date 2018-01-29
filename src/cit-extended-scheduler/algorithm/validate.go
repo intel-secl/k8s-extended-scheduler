@@ -18,9 +18,8 @@ const (
 func ValidatePodWithAnnotation(nodeData []v1.NodeSelectorRequirement, claims jwt.MapClaims) bool {
 	assetClaims := claims[ahreport].(map[string]interface{})
 	fmt.Println("Asset tag report is ", assetClaims)
-
 	for _, val := range nodeData {
-		//if val is trusted, it can be directlly found in claims
+		//if val is trusted, it can be directly found in claims
 		if sigVal, ok := claims[val.Key]; ok {
 			for _, nodeVal := range val.Values {
 				if sigVal == true || sigVal == false {
@@ -46,25 +45,27 @@ func ValidatePodWithAnnotation(nodeData []v1.NodeSelectorRequirement, claims jwt
 				}
 			}
 		} else {
-			//if strings.Contains(val.Key, ".") {
-			fmt.Println("Attestation hub val ", val)
-			//nodeValArray := strings.Split(val.Key, ".")
-
+			fmt.Println("Search parameter in AH report", val.Key)
 			if geoKey, ok := assetClaims[val.Key]; ok {
 				fmt.Println("Found Key in AH report", geoKey)
 				assetTagList, ok := geoKey.([]interface{})
+				fmt.Println("assetTagList[0] value is ", assetTagList[0])
 				if ok {
-					fmt.Println("nodeVal value is ", val.Values[0])
 					flag := false
-					for _, geoVal := range assetTagList {
-						newVal := geoVal.(string)
-						newVal = strings.Replace(newVal, " ", "", -1)
-						fmt.Println("geoVal value is ", newVal)
-						if val.Values[0] == newVal {
+					//Taking only first value from asset tag list assuming only one value will be there
+					geoVal := assetTagList[0]
+					//for _, geoVal := range assetTagList {
+					newVal := geoVal.(string)
+					newVal = strings.Replace(newVal, " ", "", -1)
+					fmt.Println("pod values are ", val.Values)
+					fmt.Println("report value is ", newVal)
+					for _, match := range val.Values {
+						if match == newVal {
 							fmt.Println("Asset tag value found in AH report")
 							flag = true
 						}
 					}
+					//}
 					if flag {
 						fmt.Println("Asset tag value found in AH report flag is true")
 						continue
@@ -73,7 +74,7 @@ func ValidatePodWithAnnotation(nodeData []v1.NodeSelectorRequirement, claims jwt
 						return false
 					}
 				}
-				//}
+
 			}
 		}
 	}

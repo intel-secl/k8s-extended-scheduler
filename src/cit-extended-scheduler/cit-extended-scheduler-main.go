@@ -18,7 +18,7 @@ func extendedScheduler(c *gin.Context) {
 	return
 }
 
-func SetupRouter()(*gin.Engine, *http.Server) {
+func SetupRouter() (*gin.Engine, *http.Server) {
 	//get a webserver instance, that contains a muxer, middleware and configuration settings
 	router := gin.Default()
 
@@ -42,7 +42,7 @@ func SetupRouter()(*gin.Engine, *http.Server) {
 	}()
 
 	router.GET("/", extendedScheduler)
-	
+
 	return router, server
 }
 

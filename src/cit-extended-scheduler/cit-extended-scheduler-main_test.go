@@ -42,6 +42,6 @@ func TestExtendedScheduler(t *testing.T) {
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
+	defer cancel()
 	srv.Shutdown(ctx)
 }
