@@ -6,12 +6,37 @@ SPDX-License-Identifier: BSD-3-Clause
 package api
 
 import (
-	//"fmt"
 	"cit-extended-scheduler/algorithm"
+	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
+	"io/ioutil"
 	schedulerapi "k8s.io/kubernetes/plugin/pkg/scheduler/api"
 )
+
+type Config struct {
+	Trusted string `"json":"trustedPrefix"`
+}
+
+const (
+	CONFPATH string = "/opt/cit_k8s_extensions/bin/tag_prefix.conf"
+)
+
+func getPrefixFromConf(path string) string {
+	out, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Println(err)
+	}
+	s := Config{}
+	err = json.Unmarshal(out, &s)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Read from config ...................")
+	fmt.Println(s.Trusted)
+	return s.Trusted
+}
 
 //FilterHandler is the filter host.
 func FilterHandler(c *gin.Context) {
@@ -20,7 +45,8 @@ func FilterHandler(c *gin.Context) {
 	//fmt.Println("Post received at extended scheduler: %v", args)
 	//Create a binding for args passed to the POST api
 	if c.BindJSON(&args) == nil {
-		result, err := algorithm.FilteredHost(&args)
+		prefixString := getPrefixFromConf(CONFPATH)
+		result, err := algorithm.FilteredHost(&args, prefixString)
 		if err == nil {
 			c.JSON(200, result)
 		} else {

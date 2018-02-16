@@ -13,14 +13,14 @@ import (
 )
 
 //FilteredHost is used for getting the nodes and pod details and verify and return if pod key matches with annotations
-func FilteredHost(args *schedulerapi.ExtenderArgs) (*schedulerapi.ExtenderFilterResult, error) {
+func FilteredHost(args *schedulerapi.ExtenderArgs, trustPrefix string) (*schedulerapi.ExtenderFilterResult, error) {
 	result := []v1.Node{}
 	failedNodesMap := schedulerapi.FailedNodesMap{}
 
 	//Get the list of nodes and pods from base scheduler
 	nodes := args.Nodes
 	pod := args.Pod
-
+	confTrustPrefix := trustPrefix
 	//Check for presence of Affinity tag in pod specification
 	if pod.Spec.Affinity != nil && pod.Spec.Affinity.NodeAffinity != nil {
 		if pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution != nil && pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms != nil {
@@ -35,7 +35,7 @@ func FilteredHost(args *schedulerapi.ExtenderArgs) (*schedulerapi.ExtenderFilter
 				if cipherVal, ok := node.Annotations["TrustTagSignedReport"]; ok {
 					for _, nodeSelector := range nodeSelectorData {
 						//match the data from the pod node selector tag to the node annotation
-						if CheckAnnotationAttrib(cipherVal, nodeSelector.MatchExpressions) {
+						if CheckAnnotationAttrib(cipherVal, nodeSelector.MatchExpressions, confTrustPrefix) {
 							result = append(result, node)
 						} else {
 							failedNodesMap[node.Name] = fmt.Sprintf("Annotation validation failed in extended-scheduler")

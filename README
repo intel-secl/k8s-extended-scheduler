@@ -30,7 +30,13 @@ Pre-requisites
 2. Create directories cit_k8s_extensions/bin inside /opt .
 
 	mkdir -p /opt/cit_k8s_extensions/bin
-	
+
+3. Create tag_prefix.conf file in /opt/cit_k8s_extensions/bin/ of k8s master machine with below json.
+
+	{
+		"trusted":<<prefix for trust tag>>
+	}
+
 
 STEPS:
 1. In order to bring up the Kubernetes cluster along with the extended scheduler, we need to:

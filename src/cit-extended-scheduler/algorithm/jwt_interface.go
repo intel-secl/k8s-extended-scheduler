@@ -55,7 +55,7 @@ func JWTParseWithClaims(cipherText string, verifyKey *rsa.PublicKey, claim jwt.M
 }
 
 //CheckAnnotationAttrib is used for validate node with restpect to time,trusted and location tags
-func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement) bool {
+func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement, trustPrefix string) bool {
 	var claims = jwt.MapClaims{}
 	pubKey := util.GetAHPublicKey()
 	verifyKey, err := ParseRSAPublicKeyFromPEM(pubKey)
@@ -79,7 +79,7 @@ func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement)
 	JWTParseWithClaims(cipherText, verifyKey, claims)
 	fmt.Println("claims after", claims)
 
-	verify := ValidatePodWithAnnotation(node, claims)
+	verify := ValidatePodWithAnnotation(node, claims, trustPrefix)
 	if verify {
 		glog.V(4).Infof("Node label validated against node annotations succesfull")
 	} else {

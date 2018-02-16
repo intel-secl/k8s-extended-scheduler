@@ -17,35 +17,41 @@ import (
 
 const (
 	ahreport string = "asset_tags"
+	trusted  string = "trusted"
 )
 
 //ValidatePodWithAnnotation is to validate signed trusted and location report with pod keys and values
-func ValidatePodWithAnnotation(nodeData []v1.NodeSelectorRequirement, claims jwt.MapClaims) bool {
+func ValidatePodWithAnnotation(nodeData []v1.NodeSelectorRequirement, claims jwt.MapClaims, trustprefix string) bool {
 	assetClaims := claims[ahreport].(map[string]interface{})
 	fmt.Println("Asset tag report is ", assetClaims)
+
 	for _, val := range nodeData {
 		//if val is trusted, it can be directly found in claims
-		if sigVal, ok := claims[val.Key]; ok {
-			for _, nodeVal := range val.Values {
-				if sigVal == true || sigVal == false {
-					fmt.Println("sigVal is boolean")
-					sigValTemp := sigVal.(bool)
-					sigVal := strconv.FormatBool(sigValTemp)
-					if nodeVal == sigVal {
-						fmt.Println("Trusted val found")
-						continue
+		if sigVal, ok := claims[trusted]; ok {
+			tr := trustprefix + trusted
+			if val.Key == tr {
+				fmt.Println("found trust label")
+				for _, nodeVal := range val.Values {
+					if sigVal == true || sigVal == false {
+						fmt.Println("sigVal is boolean")
+						sigValTemp := sigVal.(bool)
+						sigVal := strconv.FormatBool(sigValTemp)
+						if nodeVal == sigVal {
+							fmt.Println("Trusted val found")
+							continue
+						} else {
+							fmt.Println("Trust tag is tampered")
+							return false
+						}
 					} else {
-						fmt.Println("Trust tag is tampered")
-						return false
-					}
-				} else {
-					fmt.Println("sigVal is not boolean")
-					if nodeVal == sigVal {
-						fmt.Println("Trusted val found")
-						continue
-					} else {
-						fmt.Println("Trust tag is tampered")
-						return false
+						fmt.Println("sigVal is not boolean")
+						if nodeVal == sigVal {
+							fmt.Println("Trusted val found")
+							continue
+						} else {
+							fmt.Println("Trust tag is tampered")
+							return false
+						}
 					}
 				}
 			}
