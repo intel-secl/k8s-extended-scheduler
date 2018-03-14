@@ -72,7 +72,7 @@
             <id>default-build</id>
             <configuration>
               <packages>
-                <main>cit-extended-scheduler/cit-extended-scheduler-main.go</main>
+                <main>cit-extended-scheduler-main.go</main>
               </packages>
             </configuration>
           </execution>
@@ -84,7 +84,7 @@
             </goals>
             <configuration>
               <packages>
-                <app>cit-extended-scheduler/cit-extended-scheduler-main.go</app>
+                <app>cit-extended-scheduler-main.go</app>
               </packages>
             </configuration>
           </execution>
