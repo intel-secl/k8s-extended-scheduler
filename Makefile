@@ -26,7 +26,7 @@ $(SERVICE):
 # Install the service binary and the service config files
 .PHONY: install
 install:
-	@service $SERVICE stop
+	@service ${SERVICE} stop
 	@cp -f ${SERVICE}-${VERSION} ${SYSTEMINSTALLDIR}
 	@cp -f ${SERVICECONFIG} ${SERVICEINSTALLDIR}
 	@systemctl daemon-reload

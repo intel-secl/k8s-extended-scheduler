@@ -3,7 +3,7 @@ Description=Cit k8s extended scheduler
 ConditionPathExists=/opt/cit_k8s_extensions/bin/citk8sscheduler-1.0-SNAPSHOT
 
 [Service]
-ExecStart=/opt/cit_k8s_extensions/bin/citk8sscheduler-1.0-SNAPSHOT
+ExecStart=/opt/cit_k8s_extensions/bin/citk8sscheduler-1.0-SNAPSHOT -trustedprefixconf=/opt/cit_k8s_extensions/tag_prefix.conf
 KillMode=process
 Restart=on-failure
 RestartPreventExitStatus=255
