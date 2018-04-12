@@ -15,13 +15,11 @@ import (
 	schedulerapi "k8s.io/kubernetes/plugin/pkg/scheduler/api"
 )
 
-type Config struct {
-	Trusted string `"json":"trustedPrefix"`
-}
+var Confpath string
 
-const (
-	CONFPATH string = "/opt/k8s_scheduler_cit_extension-k8s_extended_scheduler/bin/tag_prefix.conf"
-)
+type Config struct {
+	Trusted string `"json":"trusted"`
+}
 
 func getPrefixFromConf(path string) string {
 	out, err := ioutil.ReadFile(path)
@@ -45,7 +43,8 @@ func FilterHandler(c *gin.Context) {
 	//fmt.Println("Post received at extended scheduler: %v", args)
 	//Create a binding for args passed to the POST api
 	if c.BindJSON(&args) == nil {
-		prefixString := getPrefixFromConf(CONFPATH)
+		fmt.Println("path inside api",Confpath)
+		prefixString := getPrefixFromConf(Confpath)
 		result, err := algorithm.FilteredHost(&args, prefixString)
 		if err == nil {
 			c.JSON(200, result)

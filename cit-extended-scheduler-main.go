@@ -16,7 +16,9 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	"flag"
 )
+
 
 func extendedScheduler(c *gin.Context) {
 	c.JSON(200, gin.H{"result": "Cit Extended Scheduler"})
@@ -55,6 +57,11 @@ func main() {
 	fmt.Printf("Starting extended scheduler...")
 	glog.V(4).Infof("Starting extended scheduler...")
 
+	trustedPrefixConf := flag.String("trustedprefixconf","","config for scheduler")
+	flag.Parse()
+	fmt.Println("confpath is",*trustedPrefixConf)
+	api.Confpath = *trustedPrefixConf
+	fmt.Println("confpath is",api.Confpath)
 	router, server := SetupRouter()
 
 	//hadler for the post operation
