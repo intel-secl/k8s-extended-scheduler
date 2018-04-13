@@ -7,7 +7,7 @@ SERVICE=citk8sscheduler
 SYSTEMINSTALLDIR=/opt/cit_k8s_extensions/bin/
 SERVICEINSTALLDIR=/etc/systemd/system/
 SERVICECONFIG=${SERVICE}.service
-
+TRUSTTAGPREFIXCONFIG=config/tag_prefix.conf
 VERSION := 1.0-SNAPSHOT
 BUILD := `date +%FT%T%z`
 
@@ -18,7 +18,7 @@ LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
 # Generate the service binary and executable
 .DEFAULT_GOAL: $(SERVICE)
 $(SERVICE):
-	glide update -v
+	glide install -v
 	# Remove this file from the deps since it causes build failures
 	@rm -f vendor/k8s.io/kubernetes/plugin/pkg/scheduler/api/zz_generated.deepcopy.go
 	go build ${LDFLAGS} -o ${SERVICE}-${VERSION} ${SOURCES}
@@ -29,8 +29,10 @@ install:
 	@service ${SERVICE} stop
 	@cp -f ${SERVICE}-${VERSION} ${SYSTEMINSTALLDIR}
 	@cp -f ${SERVICECONFIG} ${SERVICEINSTALLDIR}
+	@cp -f ${TRUSTTAGPREFIXCONFIG} ${SYSTEMINSTALLDIR}/..
 	@systemctl daemon-reload
 	@service ${SERVICE} start
+        
 
 # Uninstalls the service binary and the service config files
 .PHONY: uninstall
