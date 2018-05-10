@@ -31,7 +31,6 @@ func SetupRouter() (*gin.Engine, *http.Server) {
 
 	// fetch all the cmd line args
 	url, port, server_crt, server_key := util.GetCmdlineArgs()
-	fmt.Println(server_crt, server_key)
 
 	//initialize http server config
 	server := &http.Server{
@@ -44,7 +43,6 @@ func SetupRouter() (*gin.Engine, *http.Server) {
 		// service connections
 		if err := server.ListenAndServeTLS(server_crt, server_key); err != nil {
 			glog.V(4).Infof("listen: %s\n", err)
-			//fmt.Printf("listen %s ...", err)
 		}
 	}()
 
@@ -54,14 +52,22 @@ func SetupRouter() (*gin.Engine, *http.Server) {
 }
 
 func main() {
-	fmt.Printf("Starting extended scheduler...")
 	glog.V(4).Infof("Starting extended scheduler...")
+
+
+	 var Usage = func(){
+                fmt.Println("Usage: ./citk8sscheduler-1.0-SNAPSHOT -trustedprefixconf=<file path>")
+        }
 
 	trustedPrefixConf := flag.String("trustedprefixconf","","config for scheduler")
 	flag.Parse()
-	fmt.Println("confpath is",*trustedPrefixConf)
+
+	if *trustedPrefixConf == "" {
+                Usage()
+                return
+        }
+
 	api.Confpath = *trustedPrefixConf
-	fmt.Println("confpath is",api.Confpath)
 	router, server := SetupRouter()
 
 	//hadler for the post operation
@@ -77,9 +83,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
-
 		glog.V(4).Infof("Extended Scheduler Server Shutdown:", err)
 	}
-	glog.V(4).Infof("Extended Scheduler Server exist")
-	fmt.Printf("Stoping extended scheduler...")
+	glog.V(4).Infof("Extended Scheduler Server exit")
 }

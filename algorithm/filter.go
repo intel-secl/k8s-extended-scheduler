@@ -27,8 +27,6 @@ func FilteredHost(args *schedulerapi.ExtenderArgs, trustPrefix string) (*schedul
 
 			//get the nodeselector data
 			nodeSelectorData := pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
-			//fmt.Println("Node Affinity tag found in pod specification")
-			//fmt.Println(nodeSelectorData)
 
 			for _, node := range nodes.Items {
 				//allways check for the trust tag signed report
@@ -45,19 +43,16 @@ func FilteredHost(args *schedulerapi.ExtenderArgs, trustPrefix string) (*schedul
 			}
 		} else {
 			for _, node := range nodes.Items {
-				//fmt.Println("No Node Selector terms tag found in pod specification")
 				result = append(result, node)
 			}
 		}
 	} else {
 		for _, node := range nodes.Items {
-			//fmt.Println("No Node Affinity tag found in pod specification")
 			result = append(result, node)
 		}
 	}
 
 	glog.V(4).Infof("Returning following nodelist from extended scheduler: %v", result)
-	//fmt.Println("Returning following nodelist from extended scheduler: %v", result)
 	if len(result) != 0 {
 		return &schedulerapi.ExtenderFilterResult{
 			Nodes:       &v1.NodeList{Items: result},

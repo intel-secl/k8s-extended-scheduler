@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 package util
 
 import (
-	"fmt"
 	"github.com/tkanos/gonfig"
+	"github.com/golang/glog"
 	"strconv"
 )
 
@@ -27,21 +27,10 @@ func GetCmdlineArgs() (string, string, string, string) {
 	}
 
 	conf := extenedSchedConfig{}
-	//schedConf := flag.String("schedConf", "", "Configration file for Extended Scheduler")
-	//flag.Parse()
 	schedConf := "/opt/cit_k8s_extensions/bin/cit-extended-scheduler-config.json"
-	//err := gonfig.GetConf("./extended_scheduler_config.json", &conf)
-	/*
-		if *schedConf == "" {
-			fmt.Println("No Extended Scheduler configuration passed")
-			panic("Needs Extended Scheduler Config")
-		}
-	*/
-	//fmt.Println(schedConf)
 	err := gonfig.GetConf(schedConf, &conf)
 	if err != nil {
-		fmt.Println("Error: Please ensure extended schduler configuration is present in curent dir")
-		panic(err)
+		glog.Fatalf("Error: Please ensure extended schduler configuration is present in curent dir,%v",err)
 	}
 
 	//PORT for the extended scheduler to listen.
@@ -49,6 +38,5 @@ func GetCmdlineArgs() (string, string, string, string) {
 	port := strconv.Itoa(port_no)
 
 	AH_KEY_FILE = (conf.AttestationHubKey)
-	//fmt.Println( conf.Url, port, conf.ServerCert, conf.ServerKey)
 	return conf.Url, port, conf.ServerCert, conf.ServerKey
 }

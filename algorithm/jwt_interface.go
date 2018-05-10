@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 package algorithm
 
 import (
-	"fmt"
 	"k8s_scheduler_cit_extension-k8s_extended_scheduler/util"
 	"crypto/rsa"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -15,19 +14,12 @@ import (
 	"k8s.io/api/core/v1"
 )
 
-//fatal functions just logs and exits
-func fatal(err error) {
-	if err != nil {
-		//panic(err.Error())
-		fmt.Println(err.Error())
-	}
-}
-
 //ParseRSAPublicKeyFromPEM is used for parsing and verify public key
 func ParseRSAPublicKeyFromPEM(pubKey []byte) (*rsa.PublicKey, error) {
 	verifyKey, err := jwt.ParseRSAPublicKeyFromPEM(pubKey)
 	if err != nil {
-		fmt.Println("error in ParseRSAPublicKeyFromPEM")
+		glog.Errorf("error in ParseRSAPublicKeyFromPEM")
+		return nil,err
 	}
 	return verifyKey, err
 }
@@ -45,8 +37,7 @@ func JWTParseWithClaims(cipherText string, verifyKey *rsa.PublicKey, claim jwt.M
 	})
 	glog.V(4).Infof("Parsed token is :", token)
 	if err != nil {
-		fmt.Println("error in JWTParseWithClaims")
-		fatal(err)
+		glog.Errorf("error in JWTParseWithClaims")
 	}
 }
 
@@ -56,24 +47,19 @@ func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement,
 	pubKey := util.GetAHPublicKey()
 	verifyKey, err := ParseRSAPublicKeyFromPEM(pubKey)
 	if err != nil {
-		fatal(err)
-		glog.V(4).Infof("Invalid AH public key")
+		glog.Errorf("Invalid AH public key")
 		return false
 	}
 	validationStatus := ValidateAnnotationByPublicKey(cipherText, verifyKey)
-	//fmt.Println("validation status", validationStatus)
-	//fmt.Println("claims before", claims)
 	if validationStatus == nil {
 		glog.V(4).Infof("Signature is valid, STR is from valid AH")
 	} else {
-		fatal(validationStatus)
 		glog.Errorf("Signature validation failed")
 		return false
 	}
 
 	//cipherText is the annotation applied to the node, claims is the parsed AH report assigned as the annotation
 	JWTParseWithClaims(cipherText, verifyKey, claims)
-	fmt.Println("claims after", claims)
 
 	verify := ValidatePodWithAnnotation(node, claims, trustPrefix)
 	if verify {
