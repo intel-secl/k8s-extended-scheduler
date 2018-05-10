@@ -5,6 +5,7 @@ DESCRIPTION="CIT K8S Extended Scheduler"
 
 SERVICE=citk8sscheduler
 SYSTEMINSTALLDIR=/opt/cit_k8s_extensions/bin/
+CONFIGDIR=/opt/cit_k8s_extensions/config
 SERVICEINSTALLDIR=/etc/systemd/system/
 SERVICECONFIG=${SERVICE}.service
 VERSION := 1.0-SNAPSHOT
@@ -25,8 +26,9 @@ $(SERVICE):
 # Install the service binary and the service config files
 .PHONY: install
 install:
-	@service ${SERVICE} stop
 	@mkdir -p ${SYSTEMINSTALLDIR}
+	@mkdir -p ${CONFIGDIR}
+	@cp cit-extended-scheduler-config.json ${CONFIGDIR}
 	@cp -f ${SERVICE}-${VERSION} ${SYSTEMINSTALLDIR}
 	@cp -f ${SERVICECONFIG} ${SERVICEINSTALLDIR}
         
@@ -34,7 +36,7 @@ install:
 # Uninstalls the service binary and the service config files
 .PHONY: uninstall
 uninstall:
-	@service ${SERVICE} stop && rm -f ${SERVICEINSTALLDIR}/${SERVICE} ${SERVICEINSTALLDIR}/${SERVICECONFIG}
+	@service ${SERVICE} stop && rm -rf ${SERVICEINSTALLDIR}/${SERVICE} ${SERVICEINSTALLDIR}/${SERVICECONFIG} ${CONFIGDIR} ${SYSTEMINSTALLDIR}${SERVICE}-${VERSION}
 
 # Removes the generated service config and binary files
 .PHONY: clean

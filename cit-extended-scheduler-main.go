@@ -6,19 +6,40 @@ SPDX-License-Identifier: BSD-3-Clause
 package main
 
 import (
-	"k8s_scheduler_cit_extension-k8s_extended_scheduler/api"
-	"k8s_scheduler_cit_extension-k8s_extended_scheduler/util"
 	"context"
+	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
+	"k8s_scheduler_cit_extension-k8s_extended_scheduler/api"
+	"k8s_scheduler_cit_extension-k8s_extended_scheduler/util"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
-	"flag"
+	"io/ioutil"
 )
 
+type Config struct {
+	Trusted string `"json":"trusted"`
+}
+
+func getPrefixFromConf(path string) (string, error) {
+	out, err := ioutil.ReadFile(path)
+	if err != nil {
+		glog.Errorf("Error: %s %v", path, err)
+		return "", err
+	}
+	s := Config{}
+	err = json.Unmarshal(out, &s)
+	if err != nil {
+		glog.Errorf("Error:  %v", err)
+		return "", err
+	}
+	return s.Trusted, nil
+}
 
 func extendedScheduler(c *gin.Context) {
 	c.JSON(200, gin.H{"result": "Cit Extended Scheduler"})
@@ -54,20 +75,25 @@ func SetupRouter() (*gin.Engine, *http.Server) {
 func main() {
 	glog.V(4).Infof("Starting extended scheduler...")
 
+	var err error
 
-	 var Usage = func(){
-                fmt.Println("Usage: ./citk8sscheduler-1.0-SNAPSHOT -trustedprefixconf=<file path>")
-        }
+	var Usage = func() {
+		fmt.Println("Usage: ./citk8sscheduler-1.0-SNAPSHOT -trustedprefixconf=<file path>")
+	}
 
-	trustedPrefixConf := flag.String("trustedprefixconf","","config for scheduler")
+	trustedPrefixConf := flag.String("trustedprefixconf", "", "config for scheduler")
 	flag.Parse()
 
 	if *trustedPrefixConf == "" {
-                Usage()
-                return
-        }
+		Usage()
+		return
+	}
 
-	api.Confpath = *trustedPrefixConf
+	api.Confpath, err = getPrefixFromConf(*trustedPrefixConf)
+	if err != nil {
+		log.Fatalf("Error:in trustedprefixconf %v", err)
+	}
+
 	router, server := SetupRouter()
 
 	//hadler for the post operation

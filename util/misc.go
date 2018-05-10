@@ -7,8 +7,8 @@ package util
 
 import (
 	"github.com/tkanos/gonfig"
-	"github.com/golang/glog"
 	"strconv"
+	"log"
 )
 
 var AH_KEY_FILE string
@@ -27,10 +27,10 @@ func GetCmdlineArgs() (string, string, string, string) {
 	}
 
 	conf := extenedSchedConfig{}
-	schedConf := "/opt/cit_k8s_extensions/bin/cit-extended-scheduler-config.json"
+	schedConf := "/opt/cit_k8s_extensions/config/cit-extended-scheduler-config.json"
 	err := gonfig.GetConf(schedConf, &conf)
 	if err != nil {
-		glog.Fatalf("Error: Please ensure extended schduler configuration is present in curent dir,%v",err)
+		log.Fatalf("Error: Please ensure extended schduler configuration is present in curent dir,%v",err)
 	}
 
 	//PORT for the extended scheduler to listen.

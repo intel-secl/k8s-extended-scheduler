@@ -7,14 +7,14 @@ package util
 
 import (
 	"io/ioutil"
-	"github.com/golang/glog"
+	"log"
 )
 
 //GetAHPublicKey is used for reading and return the public key from particular file location
 func GetAHPublicKey() []byte {
 	pubKey, err := ioutil.ReadFile(AH_KEY_FILE)
 	if err != nil {
-		glog.Fatalf("Error in reading the hub pem file,%v",err)
+		log.Fatalf("Error in reading the hub pem file,%v",err)
 	}
 	return pubKey
 }
