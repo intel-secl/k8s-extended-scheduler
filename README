@@ -101,10 +101,10 @@ STEPS:
 		scp /opt/attestation-hub/configuration/hub_public_key.pem <<user>>@<<k8smasternode>>:/etc/kubernetes/pki/.
 
 
-3. Copy extended scheduler configuration file cit-extended-scheduler-config.json to /opt/cit_k8s_extensions/bin directory
+3. Copy extended scheduler configuration file cit-extended-scheduler-config.json to /opt/cit_k8s_extensions/config directory
 
 	cd ..
-	cp cit-extended-scheduler-config.json /opt/cit_k8s_extensions/bin/
+	cp cit-extended-scheduler-config.json /opt/cit_k8s_extensions/config/
 
 4. Edit cit-extended-scheduler-config.json file with appropriate URL ip address of k8smaster, port, paths to certificates(generated in pre-requisites 1) and keys(from step 2)
 
