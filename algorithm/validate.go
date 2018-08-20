@@ -20,8 +20,22 @@ const (
 	trusted  string = "trusted"
 )
 
+
+func keyExists(decoded map[string]interface{}, key string) {
+    val, ok := decoded[key]
+    return ok && val != nil
+}
+
+
 //ValidatePodWithAnnotation is to validate signed trusted and location report with pod keys and values
 func ValidatePodWithAnnotation(nodeData []v1.NodeSelectorRequirement, claims jwt.MapClaims, trustprefix string) bool {
+	glog.Infof("ValidatePodWithAnnotation - Validating node %v claims %v", nodeData, assetClaims)
+
+	if !keyExists(claims, "ahreport"){
+		glog.Errorf("ValidatePodWithAnnotation - Asset Tags not found for node.")
+		return false
+	}
+
 	assetClaims := claims[ahreport].(map[string]interface{})
 
 	for _, val := range nodeData {
@@ -36,12 +50,14 @@ func ValidatePodWithAnnotation(nodeData []v1.NodeSelectorRequirement, claims jwt
 						if nodeVal == sigVal {
 							continue
 						} else {
+							glog.Infof("ValidatePodWithAnnotation - Trust Check - Mismatch in %v field. Actual: %v | In Signature: %v ", val.Key, nodeVal, sigVal)
 							return false
 						}
 					} else {
 						if nodeVal == sigVal {
 							continue
 						} else {
+							 glog.Infof("ValidatePodWithAnnotation - Trust Check - Mismatch in %v field. Actual: %v | In Signature: %v ", val.Key, nodeVal, sigVal)
 							return false
 						}
 					}
@@ -59,6 +75,8 @@ func ValidatePodWithAnnotation(nodeData []v1.NodeSelectorRequirement, claims jwt
 					for _, match := range val.Values {
 						if match == newVal {
 							flag = true
+						}else{
+							glog.Infof("ValidatePodWithAnnotation - Geo Asset Tags - Mismatch in %v field. Actual: %v | In Signature: %v ", geoKey, match, newVal)
 						}
 					}
 					if flag {
@@ -89,7 +107,10 @@ func ValidateNodeByTime(claims jwt.MapClaims) int {
 		timeDiff := strings.Compare(trustedValidToTime, t.Format(time.RFC3339))
 		if timeDiff >= 0 {
 			trustedTimeFlag = 1
+		}else{
+			glog.Infof("ValidateNodeByTime - Node outside expiry time - ValidTo - %s |  current - %s", timeVal, t)
 		}
+
 	}
 
 	return trustedTimeFlag
