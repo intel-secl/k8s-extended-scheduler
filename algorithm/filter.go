@@ -29,10 +29,11 @@ func FilteredHost(args *schedulerapi.ExtenderArgs, trustPrefix string) (*schedul
 			nodeSelectorData := pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
 
 			for _, node := range nodes.Items {
-				//allways check for the trust tag signed report
+				//always check for the trust tag signed report
 				if cipherVal, ok := node.Annotations["TrustTagSignedReport"]; ok {
 					for _, nodeSelector := range nodeSelectorData {
 						//match the data from the pod node selector tag to the node annotation
+						glog.Infof("Checking annotation for node %s",node)
 						if CheckAnnotationAttrib(cipherVal, nodeSelector.MatchExpressions, confTrustPrefix) {
 							result = append(result, node)
 						} else {
