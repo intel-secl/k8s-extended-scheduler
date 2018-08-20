@@ -35,13 +35,13 @@ func JWTParseWithClaims(cipherText string, verifyKey *rsa.PublicKey, claim jwt.M
 	token, err := jwt.ParseWithClaims(cipherText, claim, func(token *jwt.Token) (interface{}, error) {
 		return verifyKey, nil
 	})
-	glog.V(4).Infof("Parsed token is :", token)
+	glog.Infof("Parsed token is :", token)
 	if err != nil {
 		glog.Errorf("error in JWTParseWithClaims")
 	}
 }
 
-//CheckAnnotationAttrib is used for validate node with restpect to time,trusted and location tags
+//CheckAnnotationAttrib is used to validate node with respect to time,trusted and location tags
 func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement, trustPrefix string) bool {
 	var claims = jwt.MapClaims{}
 	pubKey := util.GetAHPublicKey()
@@ -52,7 +52,7 @@ func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement,
 	}
 	validationStatus := ValidateAnnotationByPublicKey(cipherText, verifyKey)
 	if validationStatus == nil {
-		glog.V(4).Infof("Signature is valid, STR is from valid AH")
+		glog.Infof("Signature is valid, STR is from valid AH")
 	} else {
 		glog.Errorf("Signature validation failed")
 		return false
@@ -61,9 +61,11 @@ func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement,
 	//cipherText is the annotation applied to the node, claims is the parsed AH report assigned as the annotation
 	JWTParseWithClaims(cipherText, verifyKey, claims)
 
+	glog.Infof("CheckAnnotationAttrib - Parsed claims for %v",  claims)
+
 	verify := ValidatePodWithAnnotation(node, claims, trustPrefix)
 	if verify {
-		glog.V(4).Infof("Node label validated against node annotations succesfull")
+		glog.Infof("Node label validated against node annotations succesful")
 	} else {
 		glog.Errorf("Node Label did not match node annotation ")
 		return false
@@ -72,7 +74,7 @@ func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement,
 	trustTimeFlag := ValidateNodeByTime(claims)
 
 	if trustTimeFlag == 1 {
-		glog.V(4).Infof("Attested node validity time check passed")
+		glog.Infof("Attested node validity time check passed")
 		return true
 	} else {
 		glog.Errorf("Attested node validity time has expired")
