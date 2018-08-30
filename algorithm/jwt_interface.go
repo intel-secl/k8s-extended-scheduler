@@ -65,19 +65,19 @@ func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement,
 
 	verify := ValidatePodWithAnnotation(node, claims, trustPrefix)
 	if verify {
-		glog.Infof("Node label validated against node annotations succesful")
+		glog.Infoln("Node label validated against node annotations succesful")
 	} else {
-		glog.Errorf("Node Label did not match node annotation ")
+		glog.Infoln("Node Label did not match node annotation ")
 		return false
 	}
 
 	trustTimeFlag := ValidateNodeByTime(claims)
 
 	if trustTimeFlag == 1 {
-		glog.Infof("Attested node validity time check passed")
+		glog.Infoln("Attested node validity time check passed")
 		return true
 	} else {
-		glog.Errorf("Attested node validity time has expired")
+		glog.Infoln("Attested node validity time has expired")
 		return false
 	}
 }
