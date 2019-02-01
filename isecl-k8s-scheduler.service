@@ -1,9 +1,9 @@
 [Unit]
-Description=Cit k8s extended scheduler
-ConditionPathExists=/opt/cit_k8s_extensions/bin/citk8sscheduler-1.0-SNAPSHOT
+Description=ISecL k8s extended scheduler
+ConditionPathExists=/opt/isecl-k8s-extensions/bin/isecl-k8s-scheduler-1.0-SNAPSHOT
 
 [Service]
-ExecStart=/opt/cit_k8s_extensions/bin/citk8sscheduler-1.0-SNAPSHOT -trustedprefixconf=/opt/cit_k8s_extensions/tag_prefix.conf -log_dir=/var/log/syslog
+ExecStart=/opt/isecl-k8s-extensions/bin/isecl-k8s-scheduler-1.0-SNAPSHOT -trustedprefixconf=/opt/isecl-k8s-extensions/tag_prefix.conf -log_dir=/var/log/syslog
 KillMode=process
 Restart=on-failure
 RestartPreventExitStatus=255
@@ -11,4 +11,4 @@ Type=simple
 
 [Install]
 WantedBy=multi-user.target
-Alias=citk8scontroller.service
+Alias=isecl-k8s-scheduler.service
