@@ -18,9 +18,6 @@ LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
 # Generate the service binary and executable
 .DEFAULT_GOAL: $(SERVICE)
 $(SERVICE):
-	glide install -v
-	# Remove this file from the deps since it causes build failures
-	@rm -f vendor/k8s.io/kubernetes/plugin/pkg/scheduler/api/zz_generated.deepcopy.go
 	go build ${LDFLAGS} -o ${SERVICE}-${VERSION} ${SOURCES}
 
 # Install the service binary and the service config files
@@ -41,5 +38,4 @@ uninstall:
 # Removes the generated service config and binary files
 .PHONY: clean
 clean:
-	@rm -rf vendor/
 	@rm -f ${SERVICE}-${VERSION}
