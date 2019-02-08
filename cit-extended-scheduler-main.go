@@ -42,7 +42,7 @@ func getPrefixFromConf(path string) (string, error) {
 }
 
 func extendedScheduler(c *gin.Context) {
-	c.JSON(200, gin.H{"result": "Cit Extended Scheduler"})
+	c.JSON(200, gin.H{"result": "ISecL Extended Scheduler"})
 	return
 }
 

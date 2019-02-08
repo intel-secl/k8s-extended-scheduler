@@ -5,7 +5,7 @@ DESCRIPTION="ISecL K8S Extended Scheduler"
 
 SERVICE=isecl-k8s-scheduler
 SYSTEMINSTALLDIR=/opt/isecl-k8s-extensions/bin/
-CONFIGDIR=/opt/cit-k8s-extensions/config
+CONFIGDIR=/opt/isecl-k8s-extensions/config
 SERVICEINSTALLDIR=/etc/systemd/system/
 SERVICECONFIG=${SERVICE}.service
 VERSION := 1.0-SNAPSHOT
