@@ -42,7 +42,7 @@ func getPrefixFromConf(path string) (string, error) {
 }
 
 func extendedScheduler(c *gin.Context) {
-	c.JSON(200, gin.H{"result": "Cit Extended Scheduler"})
+	c.JSON(200, gin.H{"result": "ISecL Extended Scheduler"})
 	return
 }
 
@@ -73,12 +73,12 @@ func SetupRouter() (*gin.Engine, *http.Server) {
 }
 
 func main() {
-	glog.V(4).Infof("Starting extended scheduler...")
+	glog.V(4).Infof("Starting ISecL Extended Scheduler...")
 
 	var err error
 
 	var Usage = func() {
-		fmt.Println("Usage: ./citk8sscheduler-1.0-SNAPSHOT -trustedprefixconf=<file path>")
+		fmt.Println("Usage: ./isecl-k8s-scheduler-1.0-SNAPSHOT -trustedprefixconf=<file path>")
 	}
 
 	trustedPrefixConf := flag.String("trustedprefixconf", "", "config for scheduler")
@@ -104,12 +104,12 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	glog.V(4).Infof("Shutting down Extended Scheduler Server ...")
+	glog.V(4).Infof("Shutting down ISecL Extended Scheduler Server ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
-		glog.V(4).Infof("Extended Scheduler Server Shutdown:", err)
+		glog.V(4).Infof(" ISecL Extended Scheduler Server Shutdown:", err)
 	}
-	glog.V(4).Infof("Extended Scheduler Server exit")
+	glog.V(4).Infof(" ISecL Extended Scheduler Server exit")
 }

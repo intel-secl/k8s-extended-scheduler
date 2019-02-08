@@ -1,11 +1,11 @@
-# CIT K8S Extensions Extended Scheduler
+# ISecL K8S Extensions Extended Scheduler
 # Works in tandem with K8s scheduler to return a filtered list of nodes as per predicates on CRDs
 # Author:  <manux.ullas@intel.com>
-DESCRIPTION="CIT K8S Extended Scheduler"
+DESCRIPTION="ISecL K8S Extended Scheduler"
 
-SERVICE=citk8sscheduler
-SYSTEMINSTALLDIR=/opt/cit_k8s_extensions/bin/
-CONFIGDIR=/opt/cit_k8s_extensions/config
+SERVICE=isecl-k8s-scheduler
+SYSTEMINSTALLDIR=/opt/isecl-k8s-extensions/bin/
+CONFIGDIR=/opt/isecl-k8s-extensions/config
 SERVICEINSTALLDIR=/etc/systemd/system/
 SERVICECONFIG=${SERVICE}.service
 VERSION := 1.0-SNAPSHOT
@@ -25,7 +25,7 @@ $(SERVICE):
 install:
 	@mkdir -p ${SYSTEMINSTALLDIR}
 	@mkdir -p ${CONFIGDIR}
-	@cp cit-extended-scheduler-config.json ${CONFIGDIR}
+	@cp isecl-extended-scheduler-config.json ${CONFIGDIR}
 	@cp -f ${SERVICE}-${VERSION} ${SYSTEMINSTALLDIR}
 	@cp -f ${SERVICECONFIG} ${SERVICEINSTALLDIR}
         

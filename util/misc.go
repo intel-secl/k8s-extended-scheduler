@@ -27,7 +27,7 @@ func GetCmdlineArgs() (string, string, string, string) {
 	}
 
 	conf := extenedSchedConfig{}
-	schedConf := "/opt/cit_k8s_extensions/config/cit-extended-scheduler-config.json"
+	schedConf := "/opt/isecl-k8s-extensions/config/isecl-extended-scheduler-config.json"
 	err := gonfig.GetConf(schedConf, &conf)
 	if err != nil {
 		log.Fatalf("Error: Please ensure extended schduler configuration is present in curent dir,%v",err)

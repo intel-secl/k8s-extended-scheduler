@@ -18,7 +18,7 @@ var Confpath string
 //FilterHandler is the filter host.
 func FilterHandler(c *gin.Context) {
 	var args schedulerapi.ExtenderArgs
-	glog.V(4).Infof("Post received at extended scheduler: %v", args)
+	glog.V(4).Infof("Post received at  ISecL extended scheduler: %v", args)
 	//Create a binding for args passed to the POST api
 	if c.BindJSON(&args) == nil {
 		prefixString := Confpath
