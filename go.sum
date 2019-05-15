@@ -65,5 +65,5 @@ k8s.io/apimachinery v0.0.0-20170706234830-21de1bffe600 h1:6w/ZCIYKXIYH3pBVaXaPjv
 k8s.io/apimachinery v0.0.0-20170706234830-21de1bffe600/go.mod h1:ccL7Eh7zubPUSh9A3USN90/OzHNSVN6zxzde07TDCL0=
 k8s.io/client-go v0.0.0-20170728135302-d92e8497f71b h1:BK6M4hLcjSpJNbf+IexprNMCGaEocK1BCwhVtTzhALk=
 k8s.io/client-go v0.0.0-20170728135302-d92e8497f71b/go.mod h1:7vJpHMYJwNQCWgzmNV+VYUl1zCObLyodBc8nIyt8L5s=
-k8s.io/kubernetes v0.0.0-20170928221357-0b9efaeb34a2 h1:rR892bsx+C9PNk3ZZD6Rqg7pTbJwLqwuf+iRccSt/1k=
+k8s.io/kubernetes v0.0.0-20170928221357-0b9efaeb34a2 h1:N7eqdR+/bgv5KdeaUmg8jKmT4C6g+RGE3MlZhVZ+6Mg=
 k8s.io/kubernetes v0.0.0-20170928221357-0b9efaeb34a2/go.mod h1:ocZa8+6APFNC2tX1DZASIbocyYT5jHzqFVsY5aoB7Jk=
