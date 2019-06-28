@@ -1,5 +1,5 @@
 /*
-Copyright © 2018 Intel Corporation
+Copyright © 2019 Intel Corporation
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -8,11 +8,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func TestExtendedScheduler(t *testing.T) {

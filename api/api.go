@@ -1,5 +1,5 @@
 /*
-Copyright © 2018 Intel Corporation
+Copyright © 2019 Intel Corporation
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -7,13 +7,13 @@ package api
 
 import (
 	"k8s_scheduler_cit_extension-k8s_extended_scheduler/algorithm"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 	schedulerapi "k8s.io/kubernetes/plugin/pkg/scheduler/api"
 )
 
 var Confpath string
-
 
 //FilterHandler is the filter host.
 func FilterHandler(c *gin.Context) {

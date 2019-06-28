@@ -1,5 +1,5 @@
 /*
-Copyright © 2018 Intel Corporation
+Copyright © 2019 Intel Corporation
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -10,8 +10,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/golang/glog"
+	"io/ioutil"
 	"k8s_scheduler_cit_extension-k8s_extended_scheduler/api"
 	"k8s_scheduler_cit_extension-k8s_extended_scheduler/util"
 	"log"
@@ -19,7 +18,9 @@ import (
 	"os"
 	"os/signal"
 	"time"
-	"io/ioutil"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang/glog"
 )
 
 type Config struct {

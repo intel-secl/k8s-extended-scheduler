@@ -1,5 +1,5 @@
 /*
-Copyright © 2018 Intel Corporation
+Copyright © 2019 Intel Corporation
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -14,7 +14,7 @@ import (
 func GetAHPublicKey() []byte {
 	pubKey, err := ioutil.ReadFile(AH_KEY_FILE)
 	if err != nil {
-		log.Fatalf("Error in reading the hub pem file,%v",err)
+		log.Fatalf("Error in reading the hub pem file,%v", err)
 	}
 	return pubKey
 }

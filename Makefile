@@ -1,6 +1,11 @@
+#/*
+#Copyright © 2019 Intel Corporation
+#SPDX-License-Identifier: BSD-3-Clause
+#*/
+
 # ISecL K8S Extensions Extended Scheduler
 # Works in tandem with K8s scheduler to return a filtered list of nodes as per predicates on CRDs
-# Author:  <manux.ullas@intel.com>
+
 DESCRIPTION="ISecL K8S Extended Scheduler"
 
 SERVICE=isecl-k8s-scheduler
