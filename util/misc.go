@@ -1,14 +1,15 @@
 /*
-Copyright © 2018 Intel Corporation
+Copyright © 2019 Intel Corporation
 SPDX-License-Identifier: BSD-3-Clause
 */
 
 package util
 
 import (
-	"github.com/tkanos/gonfig"
-	"strconv"
 	"log"
+	"strconv"
+
+	"github.com/tkanos/gonfig"
 )
 
 var AH_KEY_FILE string
@@ -30,7 +31,7 @@ func GetCmdlineArgs() (string, string, string, string) {
 	schedConf := "/opt/isecl-k8s-extensions/config/isecl-extended-scheduler-config.json"
 	err := gonfig.GetConf(schedConf, &conf)
 	if err != nil {
-		log.Fatalf("Error: Please ensure extended schduler configuration is present in curent dir,%v",err)
+		log.Fatalf("Error: Please ensure extended schduler configuration is present in curent dir,%v", err)
 	}
 
 	//PORT for the extended scheduler to listen.
