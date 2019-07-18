@@ -79,11 +79,11 @@ Execute below steps on K8s master node for installing isecl-k8s-scheduler
 			],
 		"extenders" : [
 			{
-        		"urlPrefix": "https://<<k8s master ip address>>:8888/",
-        		"apiVersion": "v1beta1",
-        		"filterVerb": "filter",
-			     "weight": 5,
-        		"enableHttps": true
+    		"urlPrefix": "https://<<k8s master ip address>>:8888/",
+    		"apiVersion": "v1beta1",
+    		"filterVerb": "filter",
+            "weight": 5,
+    		"enableHttps": true
 			}
     		]
 	}
