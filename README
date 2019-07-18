@@ -2,14 +2,12 @@
 Building the scheduler from source
 ##############################################################################
 Pre-requisites:
-     golang >= 1.11.2
+    golang >= 1.11.2
 
 Compile:
-Copy the source code to $GOPATH/src and run below command for build
-        make
+    make
 
-Install
-        make install
+
 
 ##############################################################################
 Installation of binary on kubernetes master machine
@@ -51,7 +49,8 @@ Execute below steps on K8s master node for installing isecl-k8s-scheduler
                 "trusted":<<prefix for trust tag>>
         }
 
-3.  Edit the isecl-k8s-scheduler.service file as below with tag_prefix.conf file path
+3.  Copy the compiled source code to the K8s master node.
+    Edit the isecl-k8s-scheduler.service file as below with tag_prefix.conf file path
 
 	vi /etc/systemd/system/isecl-k8s-scheduler.service 
 
@@ -83,7 +82,7 @@ Execute below steps on K8s master node for installing isecl-k8s-scheduler
         		"urlPrefix": "https://<<k8s master ip address>>:8888/",
         		"apiVersion": "v1beta1",
         		"filterVerb": "filter",
-			"weight": 5,
+			     "weight": 5,
         		"enableHttps": true
 			}
     		]
@@ -96,20 +95,16 @@ Execute below steps on K8s master node for installing isecl-k8s-scheduler
 	(b) scp the AH's public key (or use other ways to transfer the key to k8s)
 		scp /opt/attestation-hub/configuration/hub_public_key.pem <<user>>@<<k8smasternode>>:/etc/kubernetes/pki/.
 
+6. Run the below command to install extended scheduler service
 
-6. Copy extended scheduler configuration file isecl-extended-scheduler-config.json to /opt/isecl-k8s-extensions/config directory
-
-	cd ..
-	cp isecl-extended-scheduler-config.json /opt/isecl-k8s-extensions/config/
+    make install
 
 
-7. Edit isecl-extended-scheduler-config.json file with appropriate URL ip address of k8smaster, port, paths to certificates(generated in pre-requisites 1) and keys(from step 2)
+7. Edit /opt/isecl-k8s-extenstions/isecl-extended-scheduler-config.json file with appropriate URL ip address of k8smaster, port, paths to certificates(generated in pre-requisites 1) and keys(from step 2)
+ 
 
 
-8. Place below systemd service file in /etc/systemd/system/ folder (available in the same directory as this README)
-		isecl-k8s-scheduler.service
-
-9. Configue the manifest of K8s Base scheduler
+8. Configue the manifest of K8s Base scheduler
 
 	* Add mount path for isecl extended scheduler under container section /etc/kubernetes/manifests/kube-scheduler.yaml as mentioned below
 	```shell
@@ -138,28 +133,28 @@ Execute below steps on K8s master node for installing isecl-k8s-scheduler
 	```
 
 
-10. Run below commands to enable service daemon
+9. Run below commands to enable service daemon
 	systemctl daemon-reload    #(to activate newly added service)
 
-11. Copy the complete compiled source code and run the below command
+10. Copy the complete compiled source code and run the below command
 	
 	make install
 
-12. Run the extended scheduler using below command	
+11. Run the extended scheduler using below command	
 
 	systemctl start isecl-k8s-scheduler.service
 
-13. Restart Kubelet which restart all the k8s services including kube base schedular
+12. Restart Kubelet which restart all the k8s services including kube base schedular
 		systemctl restart kubelet	
 
-14. To check status of this service run below command
+13. To check status of this service run below command
 	
 	systemctl status isecl-k8s-scheduler.service
 
-15. To stop this service run below command
+14. To stop this service run below command
 	
 	systemctl stop isecl-k8s-scheduler.service
 
-16. To check the port where extended scheduler is listening,
+15. To check the port where extended scheduler is listening, the default the port for extended schedular service is 8888
 
 	netstat -tlpn | grep 8888
