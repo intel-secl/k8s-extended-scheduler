@@ -8,7 +8,6 @@ Compile:
     make
 
 
-
 ##############################################################################
 Installation of binary on kubernetes master machine
 ##############################################################################
@@ -44,14 +43,14 @@ Execute below steps on K8s master node for installing isecl-k8s-scheduler
 	mv  k8sextscheduler-key.pem server.key
 	mv k8sextscheduler.pem server.crt
 
-2. Create tag_prefix.conf file in k8s master machine with below json.
+2. Copy the complete compiled source code to K8s master and run the below command to install extended scheduler service
+
+    make install
+
+3. Create tag_prefix.conf file in k8s master machine in the path /opt/isecl-k8s-extensions/ with below json.
         {
                 "trusted":<<prefix for trust tag>>
         }
-
-3. Copy the complete compiled source code to K8s master and run the below command to install extended scheduler service
-
-    make install
 
 
 4. In order to bring up the Kubernetes cluster along with the extended scheduler, we need to:
@@ -89,7 +88,7 @@ Execute below steps on K8s master node for installing isecl-k8s-scheduler
 
         vi /etc/systemd/system/isecl-k8s-scheduler.service
 
-        ExecStart=/opt/isecl-k8s-extensions/bin/isecl-k8s-scheduler-1.0-SNAPSHOT -trustedprefixconf=<path>/tag_prefix.conf
+        ExecStart=/opt/isecl-k8s-extensions/bin/isecl-k8s-scheduler-1.0-SNAPSHOT
 
 
 6.  Transfer the public key from the ISecl Attestation Hub and place it in /etc/kubernetes/pki/ folder 
