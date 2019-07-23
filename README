@@ -84,13 +84,6 @@ Execute below steps on K8s master node for installing isecl-k8s-scheduler
 	}
 	
 
-5.  Edit the isecl-k8s-scheduler.service file as below with tag_prefix.conf file path
-
-        vi /etc/systemd/system/isecl-k8s-scheduler.service
-
-        ExecStart=/opt/isecl-k8s-extensions/bin/isecl-k8s-scheduler-1.0-SNAPSHOT
-
-
 6.  Transfer the public key from the ISecl Attestation Hub and place it in /etc/kubernetes/pki/ folder 
 	(a) login to the machine where ISecl Attestation Reporting Hub is installed 
 	(b) scp the AH's public key (or use other ways to transfer the key to k8s)
