@@ -1,54 +1,61 @@
 ##############################################################################
-Pre-requisites for building the scheduler from source
+Building the scheduler from source
 ##############################################################################
-Note: You can skip installation of pre-requisites if already installed.
+Pre-requisites:
+    golang >= 1.11.2
 
-1. Follow steps given in pre-requisites_README on kubernetes master.
+Compile:
+    make
 
-2. Install glide vendor package management tool on the machine
-
-	sudo add-apt-repository ppa:masterminds/glide && sudo apt-get update
-	sudo apt-get install glide
-
-3. Copy the source code to $GOPATH/src and run below command for build
-
-        make
-
-4. To Install run the below command
-        make install
 
 ##############################################################################
 Installation of binary on kubernetes master machine
 ##############################################################################
 Pre-requisites
+	cfssl and cfssljson
 
-1. Generate Server cert for extended scheduler.
-	cd <path_to_create_k8s_extsched_cert.sh> #Note: Certificates generation scripts are available in cit_k8s_extensions directory
-	chmod +x create_k8s_extsched_cert.sh
-	
-	Note: ./create_k8s_extsched_cert.sh -h can be used to display script arguments. 
-	Refer clientcerts_README for more details.
-	
-	./create_k8s_extsched_cert.sh <arguments> 
-	#Example: ./create_k8s_extsched_cert.sh -c /etc/kubernetes/pki/ca.crt -k /etc/kubernetes/pki/ca.key -s "kubernetesmaster2.iind.intel.com,kubernetesmaster2"
+Execute below steps on K8s master node for installing isecl-k8s-scheduler
+1. Generate Server cert for extended scheduler by executing below steps.
+	K8S_CERT_CN="`hostname` Kubernetes Extended Scheduler"
+	K8S_SANS="hostname,IP,kubernetesmaster2"
+	K8S_SERVER_CA_KEY=/etc/kubernetes/pki/ca.key
+	K8S_SERVER_CA_CERT=/etc/kubernetes/pki/ca.crt
 
+	cat > k8sextscheduler.json <<EOF
+	{
+	"hosts": [
+			`echo $K8S_SANS | tr -s "[:space:]"| sed 's/,/\",\"/g' | sed 's/^/\"/' | sed 's/$/\"/' | sed 's/,/,\n/g'`
+	],
+	"CN": "$K8S_CERT_CN",
+	"key": {
+			"algo": "rsa",
+			"size": 2048
+	}
+	}
+	EOF
 
-2. Create tag_prefix.conf file in k8s master machine with below json.
+	cfssl genkey k8sextscheduler.json | cfssljson -bare k8sextscheduler
+	cfssl sign -csr=k8sextscheduler.csr -ca-key=${K8S_SERVER_CA_KEY} -ca=${K8S_SERVER_CA_CERT} | cfssljson -bare k8sextscheduler
+	exp_date=`cfssl certinfo -cert k8sextscheduler.pem | grep not_after | cut -d T -f 1 | tr -d '[:space:]-"' | cut -d : -f 2`
+	chmod 700 k8sextscheduler.pem
+	chmod 700 k8sextscheduler-key.pem
+	exp_date=`cfssl certinfo -cert k8sextscheduler.pem | grep not_after | cut -d T -f 1 | tr -d '[:space:]-"' | cut -d : -f 2`
+	mv  k8sextscheduler-key.pem server.key
+	mv k8sextscheduler.pem server.crt
+
+2. Copy the complete compiled source code to K8s master and run the below command to install extended scheduler service
+
+    make install
+
+3. Create tag_prefix.conf file in k8s master machine in the path /opt/isecl-k8s-extensions/ with below json.
         {
                 "trusted":<<prefix for trust tag>>
         }
 
-3.  Edit the citk8sscheduler.service file as below with tag_prefix.conf file path
 
-	vi /etc/systemd/system/citk8sscheduler.service 
+4. In order to bring up the Kubernetes cluster along with the extended scheduler, we need to:
 
-	ExecStart=/opt/cit_k8s_extensions/bin/citk8sscheduler-1.0-SNAPSHOT -trustedprefixconf=<path>/tag_prefix.conf
-
-
-STEPS:
-1. In order to bring up the Kubernetes cluster along with the extended scheduler, we need to:
-
-	(a) Create scheduler_policy.json file as per the template below. This contains the configration required by base scheduler to reach the extended scheduler. This file should be placed with the extended scheduler binary (inside /opt/cit_k8s_extensions/bin). Rewrite URL as per IP address and port.
+	(a) Create scheduler_policy.json file as per the template below. This contains the configration required by base scheduler to reach the extended scheduler. This file should be placed with the extended scheduler binary (inside /opt/isecl-k8s-extensions/bin). Rewrite URL as per IP address and port.
 	
 	{
 		"kind" : "Policy",
@@ -67,66 +74,80 @@ STEPS:
 			{"name" : "EqualPriority", "weight" : 1}
 			],
 		"extenders" : [
-			{
-        		"urlPrefix": "https://<<k8s master ip address>>:8888/",
-        		"apiVersion": "v1beta1",
-        		"filterVerb": "filter",
-			"weight": 5,
-        		"enableHttps": true
+			{"urlPrefix": "https://<<k8s master ip address>>:8888/",
+	    		 "apiVersion": "v1beta1",
+	    		 "filterVerb": "filter",
+            		 "weight": 5,
+	                 "enableHttps": true
 			}
     		]
 	}
 	
-	(b) Create file kubeadm_policy.yaml and provide below extended scheduler config in it:
 
-	apiVersion: kubeadm.k8s.io/v1alpha1
-	kind: MasterConfiguration
-	certificatesDir: "/etc/kubernetes/pki/"
-	#tokenTTL: 0
-	schedulerExtraArgs:
-	  policy-config-file : "<path_to_scheduler_policy.json>scheduler_policy.json"
-	schedulerExtraVolumes: 
-	- name : "extendedsched"
-	  hostPath : "/opt/cit_k8s_extensions/bin/"
-	  mountPath : "/opt/cit_k8s_extensions/bin/"
-		
-	Place it in the kubernetes working path /etc/kubernetes/
+5.  Edit the isecl-k8s-scheduler.service file as below with tag_prefix.conf file path
 
-	(c) Run below command,
-			kubeadm init --config <<path_to>>/kubeadm_policy.yaml
-			
-2.  Transfer the public key from the CIT AH and place it in /etc/kubernetes/pki/ folder 
-	(a) login to the machine where CIT Attestation Reporting Hub is installed 
+        vi /etc/systemd/system/isecl-k8s-scheduler.service
+
+        ExecStart=/opt/isecl-k8s-extensions/bin/isecl-k8s-scheduler-1.0-SNAPSHOT
+
+
+6.  Transfer the public key from the ISecl Attestation Hub and place it in /etc/kubernetes/pki/ folder 
+	(a) login to the machine where ISecl Attestation Reporting Hub is installed 
 	(b) scp the AH's public key (or use other ways to transfer the key to k8s)
 		scp /opt/attestation-hub/configuration/hub_public_key.pem <<user>>@<<k8smasternode>>:/etc/kubernetes/pki/.
 
 
-3. Copy extended scheduler configuration file cit-extended-scheduler-config.json to /opt/cit_k8s_extensions/config directory
+7. Edit /opt/isecl-k8s-extenstions/isecl-extended-scheduler-config.json file with appropriate URL ip address of k8smaster, port, paths to certificates(generated in pre-requisites 1) and keys(from step 2)
+ 
 
-	cd ..
-	cp cit-extended-scheduler-config.json /opt/cit_k8s_extensions/config/
 
-4. Edit cit-extended-scheduler-config.json file with appropriate URL ip address of k8smaster, port, paths to certificates(generated in pre-requisites 1) and keys(from step 2)
+8. Configue the manifest of K8s Base scheduler
 
-5. Place below systemd service file in /etc/systemd/system/ folder (available in the same directory as this README)
-		citk8sscheduler.service
+	* Add mount path for isecl extended scheduler under container section /etc/kubernetes/manifests/kube-scheduler.yaml as mentioned below
+	```shell
+	containers:
+		volumeMounts:
+		- mountPath: /etc/kubernetes/scheduler.conf
+		name: kubeconfig
+		readOnly: true
+		- mountPath: /opt/isecl-k8s-extensions/bin/
+		name: extendedsched
+		readOnly: true
+	```
 
-6. Run below commands to enable service daemon
+	* Add volume path for isecl extended scheduler under volumes section /etc/kubernetes/manifests/kube-scheduler.yaml as mentioned below
+	```shell
+	spec:
+	volumes:
+	- hostPath:
+		path: /etc/kubernetes/scheduler.conf
+		type: FileOrCreate
+		name: kubeconfig
+	- hostPath:
+		path: /opt/isecl-k8s-extensions/bin/
+		type: ""
+		name: extendedsched
+	```
+
+
+9. Run below commands to enable service daemon
 	systemctl daemon-reload    #(to activate newly added service)
+
+10. Run the extended scheduler using below command	
+
+	systemctl start isecl-k8s-scheduler.service
+
+11. Restart Kubelet which restart all the k8s services including kube base schedular
+	systemctl restart kubelet	
+
+12. To check status of this service run below command
 	
+	systemctl status isecl-k8s-scheduler.service
 
-7. Run the extended scheduler using below command	
-
-	systemctl start citk8sscheduler.service
-
-8. To check status of this service run below command
+13. To stop this service run below command
 	
-	systemctl status citk8sscheduler.service
+	systemctl stop isecl-k8s-scheduler.service
 
-9. To stop this service run below command
-	
-	systemctl stop citk8sscheduler.service
-
-10. To check the port where extended scheduler is listening,
+14. To check the port where extended scheduler is listening, the default the port for extended schedular service is 8888
 
 	netstat -tlpn | grep 8888
