@@ -8,8 +8,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"flag"
-	"fmt"
 	"io/ioutil"
 	"k8s_scheduler_cit_extension-k8s_extended_scheduler/api"
 	"k8s_scheduler_cit_extension-k8s_extended_scheduler/util"
@@ -26,6 +24,8 @@ import (
 type Config struct {
 	Trusted string `"json":"trusted"`
 }
+
+const TrustedPrefixConf = "/opt/isecl-k8s-extensions/tag_prefix.conf"
 
 func getPrefixFromConf(path string) (string, error) {
 	out, err := ioutil.ReadFile(path)
@@ -78,19 +78,7 @@ func main() {
 
 	var err error
 
-	var Usage = func() {
-		fmt.Println("Usage: ./isecl-k8s-scheduler-1.0-SNAPSHOT -trustedprefixconf=<file path>")
-	}
-
-	trustedPrefixConf := flag.String("trustedprefixconf", "", "config for scheduler")
-	flag.Parse()
-
-	if *trustedPrefixConf == "" {
-		Usage()
-		return
-	}
-
-	api.Confpath, err = getPrefixFromConf(*trustedPrefixConf)
+	api.Confpath, err = getPrefixFromConf(TrustedPrefixConf)
 	if err != nil {
 		log.Fatalf("Error:in trustedprefixconf %v", err)
 	}
