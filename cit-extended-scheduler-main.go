@@ -25,7 +25,7 @@ type Config struct {
 	Trusted string `"json":"trusted"`
 }
 
-const TrustedPrefixConf = "/opt/isecl-k8s-extensions/tag_prefix.conf"
+const TrustedPrefixConf = "/opt/isecl-k8s-extensions/"
 
 func getPrefixFromConf(path string) (string, error) {
 	out, err := ioutil.ReadFile(path)
@@ -78,7 +78,7 @@ func main() {
 
 	var err error
 
-	api.Confpath, err = getPrefixFromConf(TrustedPrefixConf)
+	api.Confpath, err = getPrefixFromConf(TrustedPrefixConf + "tag_prefix.conf")
 	if err != nil {
 		log.Fatalf("Error:in trustedprefixconf %v", err)
 	}
