@@ -28,7 +28,7 @@ func ParseRSAPublicKeyFromPEM(pubKey []byte) (*rsa.PublicKey, error) {
 	return verifyKey, err
 }
 
-//ValidateAnnotationByPublicKey is used for validate the annotation(cipher) by public key
+//ValidateAnnotationByPublicKey is used for validating the annotation(cipher) by public key
 func ValidateAnnotationByPublicKey(cipherText string, key *rsa.PublicKey) error {
 	parts := strings.Split(cipherText, ".")
 	if len(parts) != 3 {
@@ -70,11 +70,11 @@ func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement,
 		glog.Errorf("Invalid AH public key")
 		return false
 	}
-	validationStatus := ValidateAnnotationByPublicKey(cipherText, verifyKey)
-	if validationStatus == nil {
+	validationError := ValidateAnnotationByPublicKey(cipherText, verifyKey)
+	if validationError == nil {
 		glog.Infof("Signature is valid, STR is from valid AH")
 	} else {
-		glog.Errorf("Signature validation failed, Error: %v", validationStatus)
+		glog.Errorf("Signature validation failed, Error: %v", validationError)
 		return false
 	}
 
