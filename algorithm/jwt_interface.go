@@ -6,11 +6,15 @@ SPDX-License-Identifier: BSD-3-Clause
 package algorithm
 
 import (
-	"k8s_scheduler_cit_extension-k8s_extended_scheduler/util"
+	"crypto"
 	"crypto/rsa"
+	"crypto/sha512"
+	"encoding/base64"
+	"errors"
+	"strings"
+	"k8s_scheduler_cit_extension-k8s_extended_scheduler/util"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/golang/glog"
-	"golang.org/x/oauth2/jws"
 	"k8s.io/api/core/v1"
 )
 
@@ -24,10 +28,26 @@ func ParseRSAPublicKeyFromPEM(pubKey []byte) (*rsa.PublicKey, error) {
 	return verifyKey, err
 }
 
-//ValidateAnnotationByPublicKey is used for validate the annotation(cipher) by public key
+//ValidateAnnotationByPublicKey is used for validating the annotation(cipher) by public key
 func ValidateAnnotationByPublicKey(cipherText string, key *rsa.PublicKey) error {
-	validationStatus := jws.Verify(cipherText, key)
-	return validationStatus
+	parts := strings.Split(cipherText, ".")
+	if len(parts) != 3 {
+		return errors.New("jws: invalid token received, token must have 3 parts")
+	}
+
+	signedContent, err := base64.StdEncoding.DecodeString(parts[1])
+	if err != nil {
+                return err
+        }
+
+	signatureString, err := base64.StdEncoding.DecodeString(parts[2])
+	if err != nil {
+		return err
+	}
+
+	h := sha512.New384()
+	h.Write(signedContent)
+	return rsa.VerifyPKCS1v15(key, crypto.SHA384, h.Sum(nil), signatureString)
 }
 
 //JWTParseWithClaims is used for parsing and adding the annotation values in claims map
@@ -50,11 +70,11 @@ func CheckAnnotationAttrib(cipherText string, node []v1.NodeSelectorRequirement,
 		glog.Errorf("Invalid AH public key")
 		return false
 	}
-	validationStatus := ValidateAnnotationByPublicKey(cipherText, verifyKey)
-	if validationStatus == nil {
+	validationError := ValidateAnnotationByPublicKey(cipherText, verifyKey)
+	if validationError == nil {
 		glog.Infof("Signature is valid, STR is from valid AH")
 	} else {
-		glog.Errorf("Signature validation failed")
+		glog.Errorf("Signature validation failed, Error: %v", validationError)
 		return false
 	}
 

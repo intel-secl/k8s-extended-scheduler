@@ -23,7 +23,8 @@ LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
 # Generate the service binary and executable
 .DEFAULT_GOAL: $(SERVICE)
 $(SERVICE):
-	@rm -f ${GOPATH}/pkg/mod/k8s.io/kubernetes@v0.0.0-20170928221357-0b9efaeb34a2/plugin/pkg/scheduler/api/zz_generated.deepcopy.go
+	go mod download
+	@rm -f ${GOPATH}/pkg/mod/k8s.io/kubernetes*/plugin/pkg/scheduler/api/zz_generated.deepcopy.go
 	go build ${LDFLAGS} -o ${SERVICE}-${VERSION} ${SOURCES}
 
 # Install the service binary and the service config files

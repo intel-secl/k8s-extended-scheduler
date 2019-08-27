@@ -26,7 +26,6 @@ require (
 	github.com/tkanos/gonfig v0.0.0-20171219095352-e81af00e4884
 	github.com/ugorji/go v0.0.0-20170107133203-ded73eae5db7
 	golang.org/x/net v0.0.0-20170114055629-f2499483f923
-	golang.org/x/oauth2 v0.0.0-20170928010508-bb50c06baba3
 	golang.org/x/sys v0.0.0-20170901181214-7ddbeae9ae08
 	golang.org/x/text v0.0.0-20160726164857-2910a502d2bf
 	gopkg.in/go-playground/validator.v8 v8.0.0-20170730050235-5f1438d3fca6
